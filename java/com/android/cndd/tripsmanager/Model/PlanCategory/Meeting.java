@@ -5,9 +5,12 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 
+import com.android.cndd.tripsmanager.Model.IPlanViewer;
 import com.android.cndd.tripsmanager.Model.Option.PlanCategories;
 import com.android.cndd.tripsmanager.Model.Plan;
+import com.android.cndd.tripsmanager.R;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
@@ -21,16 +24,13 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         childColumns = "plan_id",
         onDelete = CASCADE)
 })
-public class Meeting implements IPlanViewer{
+public class Meeting implements IPlanViewer {
     @PrimaryKey(autoGenerate = true)
     private int id;
     @ColumnInfo(name = "plan_id")
     private int planId;
 
-    public Meeting(int planId, String description) {
-        this.planId = planId;
-        this.description = description;
-    }
+    public Meeting(){}
 
     private String description;
 
@@ -42,8 +42,36 @@ public class Meeting implements IPlanViewer{
 
     private Date endTime;
 
+    @Override
     public int getId() {
         return id;
+    }
+
+    @Override
+    public int getIconUrlId() {
+        return R.drawable.ic_flight_takeoff_black_24dp;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public String getTime() {
+        SimpleDateFormat fm = new SimpleDateFormat("hh:mm");
+        return fm.format(startTime);
+    }
+
+    @Override
+    public String getDate() {
+        SimpleDateFormat fm = new SimpleDateFormat("E, 'THG' MM dd");
+        return fm.format(startTime);
+    }
+
+    @Override
+    public String getInformation() {
+        return locationName;
     }
 
     public void setId(int id) {
@@ -58,9 +86,6 @@ public class Meeting implements IPlanViewer{
         this.planId = planId;
     }
 
-    public String getDescription() {
-        return description;
-    }
 
     public void setDescription(String destination) {
         this.description = destination;
@@ -112,10 +137,6 @@ public class Meeting implements IPlanViewer{
                 "</html>";
     }
 
-    @Override
-    public int getIConResId() {
-        return 0;
-    }
 
     @Override
     public String getCategoryName() {

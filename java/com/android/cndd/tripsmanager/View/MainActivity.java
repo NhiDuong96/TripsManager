@@ -8,8 +8,8 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.android.cndd.tripsmanager.Model.ITripViewer;
 import com.android.cndd.tripsmanager.R;
-import com.android.cndd.tripsmanager.Viewer.TripViewer;
 
 /**
  * Created by Minh Nhi on 3/10/2018.
@@ -61,11 +61,11 @@ public class MainActivity extends AppCompatActivity implements TripsListFragment
     }
 
     @Override
-    public void onItemSelectedListener(TripViewer viewer) {
+    public void onItemSelectedListener(ITripViewer viewer) {
         Log.d("A", "onItemSelectedListener: ");
         Intent intent = new Intent(this, PlansActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putSerializable(TRIP, viewer);
+        bundle.putSerializable("trip", viewer);
         intent.putExtra("plans",bundle);
         startActivity(intent);
     }

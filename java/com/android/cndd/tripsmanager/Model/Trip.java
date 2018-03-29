@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import com.android.cndd.tripsmanager.Model.Option.Priority;
 import com.android.cndd.tripsmanager.Model.Option.Status;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -16,7 +17,7 @@ import java.util.Date;
  */
 
 @Entity(indices = {@Index(value = {"title"}, unique = true)})
-public class Trip {
+public class Trip implements ITripViewer{
     @PrimaryKey(autoGenerate = true)
     private int id;
 
@@ -47,12 +48,31 @@ public class Trip {
         this.description = description;
     }
 
+    @Override
     public int getId() {
         return id;
     }
 
+    @Override
+    public String getIconUrl() {
+        return null;
+    }
+
+    @NonNull
+    @Override
     public String getTitle() {
         return title;
+    }
+
+    @Override
+    public String getTime() {
+        SimpleDateFormat fm = new SimpleDateFormat("E,dd 'thg' MM,yyyy");
+        return fm.format(startTime) + " - " + fm.format(endTime);
+    }
+
+    @Override
+    public String getInterval() {
+        return "1 day";
     }
 
     public String getDestination() {

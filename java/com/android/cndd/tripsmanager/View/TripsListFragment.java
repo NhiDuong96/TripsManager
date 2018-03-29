@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
 
+import com.android.cndd.tripsmanager.Model.ITripViewer;
 import com.android.cndd.tripsmanager.Model.Trip;
 import com.android.cndd.tripsmanager.R;
 import com.android.cndd.tripsmanager.ViewHelper.BackgroundContainer;
@@ -26,7 +27,6 @@ import com.android.cndd.tripsmanager.ViewModel.Query;
 import com.android.cndd.tripsmanager.ViewModel.QueryFactory;
 import com.android.cndd.tripsmanager.ViewModel.QueryTransaction;
 import com.android.cndd.tripsmanager.ViewModel.TripViewModel;
-import com.android.cndd.tripsmanager.Viewer.TripViewer;
 
 /**
  * Created by Minh Nhi on 3/10/2018.
@@ -50,7 +50,7 @@ public class TripsListFragment extends Fragment {
     private TripViewModel.TripLiveData dataLiveUpdateUI;
 
     public interface OnItemSelectedListener{
-        void onItemSelectedListener(TripViewer viewer);
+        void onItemSelectedListener(ITripViewer viewer);
     }
 
     @Override
@@ -68,14 +68,14 @@ public class TripsListFragment extends Fragment {
                 listView.setAdapter(tripsAdapter);
 
                 OnActionTouchItemListener removalTouchListener =
-                        new OnActionTouchItemListener<TripViewer>(context, listView,tripsAdapter,backgroundContainer){
+                        new OnActionTouchItemListener<ITripViewer>(context, listView,tripsAdapter,backgroundContainer){
                             @Override
-                            protected void onRemoveItem(TripViewer item) {
+                            protected void onRemoveItem(ITripViewer item) {
                                 removeItem(item);
                             }
 
                             @Override
-                            protected void onTouchItem(TripViewer item) {
+                            protected void onTouchItem(ITripViewer item) {
                                 listener.onItemSelectedListener(item);
                             }
                         };
@@ -87,7 +87,7 @@ public class TripsListFragment extends Fragment {
         });
     }
 
-    public void removeItem(TripViewer viewer){
+    public void removeItem(ITripViewer viewer){
         Trip trip = tripViewModel.getTripFromId(viewer.getId());
         Query<Trip> query = new QueryFactory.DeleteOperation<>(tripViewModel ,trip);
         query.setUpdateUIListener(dataLiveUpdateUI);

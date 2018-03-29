@@ -3,6 +3,7 @@ package com.android.cndd.tripsmanager.View;
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,8 +18,9 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ImageButton;
 
+import com.android.cndd.tripsmanager.Model.ITripViewer;
 import com.android.cndd.tripsmanager.Model.Option.PlanCategories;
-import com.android.cndd.tripsmanager.Model.PlanCategory.IPlanViewer;
+import com.android.cndd.tripsmanager.Model.IPlanViewer;
 import com.android.cndd.tripsmanager.R;
 import com.android.cndd.tripsmanager.ViewHelper.MarkerDemoActivity;
 import com.android.cndd.tripsmanager.ViewHelper.OnFragmentAnimationEndListener;
@@ -39,14 +41,12 @@ public class PlanDetailsFragment extends Fragment implements View.OnClickListene
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         PlanViewModel planViewModel = ViewModelProviders.of(getActivity()).get(PlanViewModel.class);
-        try {
-            object = planViewModel.getSelected();
-            if(object != null)
-                webView.loadData(object.toHtmlLayout(), "text/html", "utf-8");
-        }
-        catch (Exception e){
-            Log.e("Details Plan Error", "onCreateView: ", e);
-        }
+        planViewModel.getSelected().observe(this, iPlanViewer -> {
+            if(iPlanViewer == null) return;
+            object = iPlanViewer;
+            Log.e("update plan details", "onActivityCreated: "+ iPlanViewer.getDescription());
+            webView.loadData(iPlanViewer.toHtmlLayout(),"text/html", "utf-8");
+        });
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -61,21 +61,24 @@ public class PlanDetailsFragment extends Fragment implements View.OnClickListene
         nagative.setOnClickListener(this);
 
         FloatingActionButton edit = view.findViewById(R.id.edit);
+        Bundle bundle = getArguments();
+        ITripViewer mTripViewer = (ITripViewer) bundle.getSerializable("trip");
+
         edit.setOnClickListener(v->{
-            if(object == null) return;
+            if(object == null ||  mTripViewer == null) return;
             Intent intent = null;
             switch (PlanCategories.valueOf(object.getCategoryName())){
                 case Meeting:
-                    //intent = new Intent(getContext(),MeetingCreateActivity.class);
+                    intent = new Intent(getContext(),MeetingCreateActivity.class);
                     break;
                 case Restaurant:
                     break;
             }
-            intent = new Intent(getContext(),MeetingCreateActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putInt("action", 0);
-            bundle.putInt("tripId", mTripViewer.getId());
-            intent.putExtra("plan", bundle);
+            Bundle b = new Bundle();
+            b.putInt("action", 1);
+            b.putInt("tripId", mTripViewer.getId());
+            b.putInt("planId", object.getId());
+            intent.putExtra("plan", b);
             startActivity(intent);
         });
 

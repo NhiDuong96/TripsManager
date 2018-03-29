@@ -15,10 +15,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.android.cndd.tripsmanager.Model.ITripViewer;
 import com.android.cndd.tripsmanager.R;
 import com.android.cndd.tripsmanager.ViewHelper.OnFragmentAnimationStartListener;
 import com.android.cndd.tripsmanager.ViewHelper.OnFragmentAnimationEndListener;
-import com.android.cndd.tripsmanager.Viewer.PlanViewer;
+
 
 /**
  * Created by Minh Nhi on 3/20/2018.
@@ -34,21 +35,25 @@ public class PlansActivity extends AppCompatActivity implements
     private PlansListFragment mPlansListFragment;
     private PlanDetailsFragment mPlanDetailsFragment;
     private View mDarkHoverView;
+    private ITripViewer tripViewer;
+    private Bundle bundle;
 
     boolean mDidSlideOut = false;
     boolean mIsAnimating = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.e(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.plans_activity_layout);
 
         mDarkHoverView = findViewById(R.id.dark_hover_view);
         mDarkHoverView.setAlpha(0);
 
+        bundle = new Bundle();
+        bundle.putAll(getIntent().getBundleExtra("plans"));
         mPlansListFragment = new PlansListFragment();
-        mPlansListFragment.setArguments(getIntent().getBundleExtra("plans"));
-
+        mPlansListFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.move_to_back_container, mPlansListFragment)
                 .commit();
@@ -56,6 +61,13 @@ public class PlansActivity extends AppCompatActivity implements
         getSupportFragmentManager().addOnBackStackChangedListener(this);
 
         mPlansListFragment.setClickListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Log.e(TAG, "onResume: " + getSupportFragmentManager().getBackStackEntryCount());
     }
 
     @Override
@@ -98,6 +110,7 @@ public class PlansActivity extends AppCompatActivity implements
             mDidSlideOut = true;
 
             mPlanDetailsFragment = new PlanDetailsFragment();
+            mPlanDetailsFragment.setArguments(bundle);
             mPlanDetailsFragment.setClickListener(mClickListener);
             mPlanDetailsFragment.setOnTextFragmentAnimationEnd(this);
 

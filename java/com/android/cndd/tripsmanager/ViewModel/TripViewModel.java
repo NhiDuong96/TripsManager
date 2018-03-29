@@ -8,11 +8,12 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.android.cndd.tripsmanager.Model.EntityDao.TripDao;
+import com.android.cndd.tripsmanager.Model.ITripViewer;
 import com.android.cndd.tripsmanager.Model.Trip;
-import com.android.cndd.tripsmanager.Viewer.TripViewer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 /**
  * Created by Minh Nhi on 3/4/2018.
@@ -54,9 +55,9 @@ public class TripViewModel extends ViewModel<Trip> {
 
 
     //class
-    public class TripLiveData extends LiveData<List<TripViewer>>
+    public class TripLiveData extends LiveData<List<ITripViewer>>
             implements IQueryUIObserver<Trip> {
-        private List<TripViewer> tripViewers = new ArrayList<>();
+        private List<ITripViewer> tripViewers = new ArrayList<>();
         private TripDao tripDao;
 
         TripLiveData(TripDao tripDao){
@@ -75,18 +76,18 @@ public class TripViewModel extends ViewModel<Trip> {
         @SuppressLint("StaticFieldLeak")
         public void loadData(){
             tripViewers.clear();
-            new AsyncTask<Void, TripViewer, Void>() {
+            new AsyncTask<Void, ITripViewer, Void>() {
                 @Override
                 protected Void doInBackground(Void... voids) {
                     for(Integer id: tripDao.getAllIds()){
                         //SystemClock.sleep(1000);
-                        publishProgress(TripViewer.convertFromObj(tripDao.getTripById(id)));
+                        publishProgress(tripDao.getTripById(id));
                     }
                     return null;
                 }
 
                 @Override
-                protected void onProgressUpdate(TripViewer... values) {
+                protected void onProgressUpdate(ITripViewer... values) {
                     super.onProgressUpdate(values);
                     if(values[0] == null) return;
                     tripViewers.add(values[0]);
@@ -98,9 +99,7 @@ public class TripViewModel extends ViewModel<Trip> {
         @Override
         public void onInsert(Query<Trip> query, Query.QueryArg args) {
             try {
-                Trip trip = tripDao.getLastItem();
-                TripViewer viewer = TripViewer.convertFromObj(trip);
-                tripViewers.add(viewer);
+                tripViewers.add(tripDao.getLastItem());
             }catch (Exception ex){
                 return;
             }
@@ -111,8 +110,7 @@ public class TripViewModel extends ViewModel<Trip> {
         @Override
         public void onDelete(Query<Trip> query, Query.QueryArg queryArgs) {
             try {
-                TripViewer viewer = (TripViewer) queryArgs.args[0];
-                tripViewers.remove(viewer);
+                tripViewers.remove((ITripViewer)queryArgs.args[0]);
             }catch (Exception ex){
                 Log.e(TAG, "onDelete: ", ex);
                 return;
@@ -123,8 +121,12 @@ public class TripViewModel extends ViewModel<Trip> {
         @Override
         public void onUpdate(Query<Trip> query, Query.QueryArg queryArgs) {
             try {
-                int position = (int) queryArgs.args[0];
-                tripViewers.set(position, TripViewer.convertFromObj(query.getObj()));
+                for(int i = 0; i < tripViewers.size() ;i++){
+                    if(tripViewers.get(i).getId() == (int)queryArgs.args[0]){
+                        tripViewers.set(i, query.getObj());
+                    }
+                }
+
             }catch (Exception ex){
                 Log.e(TAG, "Update: ", ex);
                 return;

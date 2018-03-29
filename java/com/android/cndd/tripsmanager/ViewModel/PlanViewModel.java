@@ -6,12 +6,12 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.android.cndd.tripsmanager.Model.DBContext;
 import com.android.cndd.tripsmanager.Model.EntityDao.PlanDao;
+import com.android.cndd.tripsmanager.Model.IPlanViewer;
 import com.android.cndd.tripsmanager.Model.Plan;
-import com.android.cndd.tripsmanager.Model.PlanCategory.IPlanViewer;
-import com.android.cndd.tripsmanager.Viewer.PlanViewer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,15 +32,14 @@ public class PlanViewModel extends ViewModel<Plan>{
         planDao = dbContext.planDao();
     }
 
-    public void select(PlanViewer viewer){
+    public void select(IPlanViewer viewer){
         MutableLiveData<IPlanViewer> iPlanViewerMutableLiveData = new MutableLiveData<>();
-        Plan plan = getPlanById(viewer.getId());
-        iPlanViewerMutableLiveData.setValue((IPlanViewer) getObjFromPlan(plan));
+        iPlanViewerMutableLiveData.setValue(viewer);
         selected = iPlanViewerMutableLiveData;
     }
 
-    public IPlanViewer getSelected(){
-        return selected.getValue();
+    public MutableLiveData<IPlanViewer> getSelected(){
+        return selected;
     }
 
     @Override
@@ -87,10 +86,10 @@ public class PlanViewModel extends ViewModel<Plan>{
     }
 
 
-    public class PlanLiveData extends LiveData<List<PlanViewer>>
+    public class PlanLiveData extends LiveData<List<IPlanViewer>>
         implements IQueryUIObserver<Plan>{
         private static final String TAG = "PlanLiveData";
-        private List<PlanViewer> planViewers = new ArrayList<>();
+        private List<IPlanViewer> planViewers = new ArrayList<>();
         private DBContext context;
         private PlanDao dao;
         private int tripId;
@@ -111,18 +110,18 @@ public class PlanViewModel extends ViewModel<Plan>{
 
         @SuppressLint("StaticFieldLeak")
         public void loadData(){
-            new AsyncTask<Void, PlanViewer, Void>() {
+            new AsyncTask<Void, IPlanViewer, Void>() {
                 @Override
                 protected Void doInBackground(Void... voids) {
                     for(int plan_id : dao.getAllIds(tripId)){
                         Plan plan = dao.getPlanById(plan_id);
-                        publishProgress(PlanViewer.convertFromObj(plan, getObjFromPlan(plan)));
+                        publishProgress((IPlanViewer) getObjFromPlan(plan));
                     }
                     return null;
                 }
 
                 @Override
-                protected void onProgressUpdate(PlanViewer... values) {
+                protected void onProgressUpdate(IPlanViewer... values) {
                     super.onProgressUpdate(values);
                     if(values[0] == null) return;
                     planViewers.add(values[0]);
@@ -135,7 +134,7 @@ public class PlanViewModel extends ViewModel<Plan>{
         public void onInsert(Query<Plan> query, Query.QueryArg args) {
             try {
                 Plan plan = planDao.getLastItem();
-                planViewers.add(PlanViewer.convertFromObj(plan, getObjFromPlan(plan)));
+                planViewers.add((IPlanViewer) getObjFromPlan(plan));
             }
             catch (Exception ex){
                 return;
@@ -146,7 +145,7 @@ public class PlanViewModel extends ViewModel<Plan>{
         @Override
         public void onDelete(Query<Plan> query, Query.QueryArg queryArgs) {
             try {
-                PlanViewer viewer = (PlanViewer) queryArgs.args[0];
+                IPlanViewer viewer = (IPlanViewer) queryArgs.args[0];
                 planViewers.remove(viewer);
             }catch (Exception ex){
                 return;
@@ -155,8 +154,21 @@ public class PlanViewModel extends ViewModel<Plan>{
         }
 
         @Override
-        public void onUpdate(Query<Plan> query, Query.QueryArg args) {
-
+        public void onUpdate(Query<Plan> query, Query.QueryArg queryArgs) {
+            try {
+                for(int i = 0; i < planViewers.size(); i++){
+                    if(planViewers.get(i).getId() == (int)queryArgs.args[0]){
+                        IPlanViewer viewer = (IPlanViewer) query.getObj();
+                        planViewers.set(i, viewer);
+                        selected.setValue(viewer);
+                        break;
+                    }
+                }
+            }catch (Exception ex){
+                Log.e(TAG, "Update: ", ex);
+                return;
+            }
+            setValue(planViewers);
         }
 
         @Override

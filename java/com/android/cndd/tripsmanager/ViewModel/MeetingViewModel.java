@@ -34,4 +34,8 @@ public class MeetingViewModel extends ViewModel<Meeting> {
     public void Update(Meeting obj) {
         meetingDao.update(obj);
     }
+
+    public Meeting getMeetingFromPlanId(int planId){
+        return meetingDao.getMeeting(planId);
+    }
 }

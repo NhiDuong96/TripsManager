@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.cndd.tripsmanager.Model.IPlanViewer;
 import com.android.cndd.tripsmanager.R;
-import com.android.cndd.tripsmanager.Viewer.PlanViewer;
 
 import java.util.List;
 
@@ -18,13 +18,13 @@ import java.util.List;
  */
 
 public class PlansCardViewAdapter extends RecyclerView.Adapter<PlansCardViewAdapter.ViewHolder>
-    implements IAdapterHelper<PlanViewer> {
+    implements IAdapterHelper<IPlanViewer> {
 
     private int resLayoutId;
-    private List<PlanViewer> list;
+    private List<IPlanViewer> list;
     private View.OnTouchListener mTouchListener;
 
-    public PlansCardViewAdapter(int resLayoutId, List<PlanViewer> list){
+    public PlansCardViewAdapter(int resLayoutId, List<IPlanViewer> list){
         this.resLayoutId = resLayoutId;
         this.list = list;
     }
@@ -43,11 +43,11 @@ public class PlansCardViewAdapter extends RecyclerView.Adapter<PlansCardViewAdap
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        PlanViewer viewer = list.get(position);
+        IPlanViewer viewer = list.get(position);
         holder.date.setText(viewer.getDate());
         holder.time.setText(viewer.getTime());
-        holder.icon.setImageResource(viewer.getIconUrl());
-        holder.desciption.setText(viewer.getDesciption());
+        holder.icon.setImageResource(viewer.getIconUrlId());
+        holder.desciption.setText(viewer.getDescription());
         holder.infomation.setText(viewer.getInformation());
     }
 
@@ -57,7 +57,7 @@ public class PlansCardViewAdapter extends RecyclerView.Adapter<PlansCardViewAdap
     }
 
     @Override
-    public PlanViewer getItem(int position) {
+    public IPlanViewer getItem(int position) {
         return list.get(position);
     }
 

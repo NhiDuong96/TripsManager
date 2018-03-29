@@ -11,6 +11,8 @@
             android:id="@+id/description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="text"
+            android:imeOptions="actionDone"
             android:hint="@string/description" />
     </android.support.design.widget.TextInputLayout>
     <android.support.design.widget.TextInputLayout
@@ -19,6 +21,8 @@
         <AutoCompleteTextView
             android:id="@+id/location_name"
             android:hint="@string/location_name"
+            android:inputType="text"
+            android:imeOptions="actionDone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </android.support.design.widget.TextInputLayout>
@@ -29,6 +33,8 @@
             android:id="@+id/address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="text"
+            android:imeOptions="actionDone"
             android:hint="@string/address" />
     </android.support.design.widget.TextInputLayout>
     <include

@@ -57,4 +57,12 @@ public class PickDate{
             });
         }
     };
+
+    public static String convertToDate(Date date){
+        return String.format(Locale.getDefault(), "%d-%d-%d", date.getDay(), date.getMonth(), date.getYear());
+    }
+
+    public static String convertToTime(Date date){
+        return String.format(Locale.getDefault(), "%d:%d", date.getHours(), date.getMinutes());
+    }
 }

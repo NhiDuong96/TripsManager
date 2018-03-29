@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.android.cndd.tripsmanager.Model.ITripViewer;
 import com.android.cndd.tripsmanager.R;
-import com.android.cndd.tripsmanager.Viewer.TripViewer;
 
 import java.util.List;
 
@@ -19,13 +19,13 @@ import de.hdodenhof.circleimageview.CircleImageView;
  */
 
 public class TripsCardViewAdapter extends RecyclerView.Adapter<TripsCardViewAdapter.ViewHolder>
-    implements IAdapterHelper<TripViewer> {
+    implements IAdapterHelper<ITripViewer> {
 
     private int resLayoutId;
-    private List<TripViewer> list;
+    private List<ITripViewer> list;
     private View.OnTouchListener mTouchListener;
 
-    public TripsCardViewAdapter(int resLayoutId, List<TripViewer> list){
+    public TripsCardViewAdapter(int resLayoutId, List<ITripViewer> list){
         this.resLayoutId = resLayoutId;
         this.list = list;
     }
@@ -35,7 +35,7 @@ public class TripsCardViewAdapter extends RecyclerView.Adapter<TripsCardViewAdap
     }
 
     @Override
-    public TripViewer getItem(int position){
+    public ITripViewer getItem(int position){
         return list.get(position);
     }
 
