@@ -1,0 +1,56 @@
+
+
+<com.android.cndd.tripsmanager.ViewHelper.FractionalLinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:layout_marginLeft="@dimen/slide_fragment_horizontal_margin"
+    android:layout_marginRight="@dimen/slide_fragment_horizontal_margin">
+
+    <ImageButton
+        android:id="@+id/exit"
+        android:contentDescription="Exit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:layout_alignParentEnd="true"
+        android:src="@android:drawable/ic_delete"/>
+
+    <WebView
+        android:id="@+id/content"
+        android:layout_below="@+id/exit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="@dimen/fab_margin">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/nagative"
+            android:backgroundTint="#3F51B5"
+            android:layout_marginEnd="5dp"
+            android:layout_toStartOf="@+id/edit"
+            android:src="@android:drawable/ic_dialog_map"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/edit"
+            android:backgroundTint="#009688"
+            android:layout_toStartOf="@+id/delete"
+            android:layout_marginEnd="5dp"
+            android:src="@android:drawable/ic_menu_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/delete"
+            android:layout_alignParentEnd="true"
+            android:src="@android:drawable/ic_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+</com.android.cndd.tripsmanager.ViewHelper.FractionalLinearLayout>

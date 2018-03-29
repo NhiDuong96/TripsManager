@@ -1,0 +1,7 @@
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="slide_fragment_horizontal_margin">20dp</dimen>
+    <dimen name="text_vertical_margin">18dp</dimen>
+    <dimen name="text_horizontal_margin">10dp</dimen>
+    <dimen name="slide_up_down_fraction">1.0</dimen>
+</resources>
