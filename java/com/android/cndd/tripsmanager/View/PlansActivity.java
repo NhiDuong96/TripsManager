@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
@@ -84,9 +85,15 @@ public class PlansActivity extends AppCompatActivity implements
                 break;
             case R.id.edit:
                 Log.d(TAG, "onOptionsItemSelected: edit");
+                Bundle bundle = getIntent().getBundleExtra("plans");
+                bundle.putInt("action",1);
+                Intent intent = new Intent(this, TripsCreateActivity.class);
+                intent.putExtra("trip_update", bundle);
+                startActivity(intent);
                 break;
             case R.id.del:
                 Log.d(TAG, "onOptionsItemSelected: delete");
+
                 break;
             case android.R.id.home:
                 finish();

@@ -4,9 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardCornerRadius="5dp"
-    app:cardBackgroundColor="#d5efd4"
-    android:layout_margin="16dp"
-    app:cardMaxElevation="16dp"
+    app:cardBackgroundColor="#BBDEFB"
+    android:layout_margin="10dp"
     app:cardElevation="8dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
@@ -14,6 +13,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
         android:orientation="horizontal">
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -22,7 +25,7 @@
             android:layout_height="90dp"
             android:scaleType="centerCrop"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_launcher_background"
+            android:src="@drawable/travel_guide"
             />
 
         <LinearLayout
@@ -34,18 +37,25 @@
                 android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
                 android:text="title"
                 android:textStyle="bold"
+                android:textSize="18sp"
                 />
             <TextView
                 android:id="@+id/time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
                 android:text="thoi gian di chuyen" />
             <TextView
                 android:id="@+id/interval"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:drawableStart="@drawable/icons8_clock"
+                android:textColor="#BDBDBD"
+                android:drawablePadding="5dp"
+                android:gravity="center"
                 android:text="interval"
                 />
         </LinearLayout>

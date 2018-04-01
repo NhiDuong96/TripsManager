@@ -54,10 +54,14 @@ public class TripsCardViewAdapter extends RecyclerView.Adapter<TripsCardViewAdap
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.circleImageView.setImageResource(R.drawable.ic_launcher_background);
-        holder.title.setText(list.get(position).getTitle());
-        holder.time.setText(list.get(position).getTime());
-        holder.interval.setText(list.get(position).getInterval());
+        ITripViewer viewer = list.get(position);
+        if(viewer.getIconUrl() != null){
+            holder.circleImageView.setImageBitmap(null);
+        }
+
+        holder.title.setText(viewer.getTitle());
+        holder.time.setText(viewer.getTime());
+        holder.interval.setText(viewer.getInterval());
     }
 
     @Override

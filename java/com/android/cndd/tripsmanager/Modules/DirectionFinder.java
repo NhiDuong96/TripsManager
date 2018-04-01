@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.android.cndd.tripsmanager.R;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
@@ -26,7 +27,7 @@ import java.util.List;
  */
 public class DirectionFinder {
     private static final String DIRECTION_URL_API = "https://maps.googleapis.com/maps/api/directions/json?";
-    private static final String GOOGLE_API_KEY = "AIzaSyCCz3lLOyi1UHBSmY27wzq4LT5bPAi9tAE";
+    private static final String GOOGLE_API_KEY = "";
     private DirectionFinderListener listener;
     private LatLng origin;
     private LatLng destination;

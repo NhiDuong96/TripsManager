@@ -3,6 +3,7 @@ package com.android.cndd.tripsmanager.View;
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -21,10 +22,14 @@ import android.widget.ImageButton;
 import com.android.cndd.tripsmanager.Model.ITripViewer;
 import com.android.cndd.tripsmanager.Model.Option.PlanCategories;
 import com.android.cndd.tripsmanager.Model.IPlanViewer;
+import com.android.cndd.tripsmanager.Model.Plan;
 import com.android.cndd.tripsmanager.R;
 import com.android.cndd.tripsmanager.ViewHelper.MarkerDemoActivity;
 import com.android.cndd.tripsmanager.ViewHelper.OnFragmentAnimationEndListener;
 import com.android.cndd.tripsmanager.ViewModel.PlanViewModel;
+import com.android.cndd.tripsmanager.ViewModel.Query;
+import com.android.cndd.tripsmanager.ViewModel.QueryFactory;
+import com.android.cndd.tripsmanager.ViewModel.QueryTransaction;
 
 /**
  * Created by Minh Nhi on 3/14/2018.
@@ -36,17 +41,19 @@ public class PlanDetailsFragment extends Fragment implements View.OnClickListene
     private OnFragmentAnimationEndListener mListener;
     private WebView webView;
     private IPlanViewer object;
-
+    private PlanViewModel planViewModel;
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        PlanViewModel planViewModel = ViewModelProviders.of(getActivity()).get(PlanViewModel.class);
-        planViewModel.getSelected().observe(this, iPlanViewer -> {
-            if(iPlanViewer == null) return;
-            object = iPlanViewer;
-            Log.e("update plan details", "onActivityCreated: "+ iPlanViewer.getDescription());
-            webView.loadData(iPlanViewer.toHtmlLayout(),"text/html", "utf-8");
-        });
+        planViewModel = ViewModelProviders.of(getActivity()).get(PlanViewModel.class);
+
+        MutableLiveData<IPlanViewer> planViewerMutableLiveData = planViewModel.getSelected();
+        if(planViewerMutableLiveData != null)
+            planViewerMutableLiveData.observe(this, iPlanViewer -> {
+                if(iPlanViewer == null) return;
+                object = iPlanViewer;
+                webView.loadData(iPlanViewer.toHtmlLayout(),"text/html", "utf-8");
+            });
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -82,6 +89,15 @@ public class PlanDetailsFragment extends Fragment implements View.OnClickListene
             startActivity(intent);
         });
 
+        FloatingActionButton del = view.findViewById(R.id.delete);
+        del.setOnClickListener(v ->{
+            Plan plan = planViewModel.getPlanById(object.getId());
+            Query<Plan> query = new QueryFactory.DeleteOperation<>(planViewModel, plan);
+            query.setUpdateUIListener(planViewModel.getPlanLiveData(mTripViewer.getId()));
+            query.setArguments(object);
+            QueryTransaction.getTransaction().execOnMainThread(query);
+        });
+        del.setOnClickListener(clickListener);
         return view;
     }
 

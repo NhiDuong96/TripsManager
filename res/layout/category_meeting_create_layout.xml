@@ -2,11 +2,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingStart="@dimen/fab_margin"
-    android:paddingEnd="@dimen/fab_margin">
+    android:scrollbars="vertical"
+    android:padding="16dp">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:paddingStart="5dp"
+        android:text="@string/activity_type"
+        />
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="70dp">
         <EditText
             android:id="@+id/description"
             android:layout_width="match_parent"
@@ -17,7 +30,7 @@
     </android.support.design.widget.TextInputLayout>
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="70dp">
         <AutoCompleteTextView
             android:id="@+id/location_name"
             android:hint="@string/location_name"
@@ -28,7 +41,7 @@
     </android.support.design.widget.TextInputLayout>
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="70dp">
         <EditText
             android:id="@+id/address"
             android:layout_width="match_parent"
@@ -39,4 +52,17 @@
     </android.support.design.widget.TextInputLayout>
     <include
         layout="@layout/helper_date_time_layout"/>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp">
+        <EditText
+            android:id="@+id/note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:lines="4"
+            android:imeOptions="actionDone"
+            android:hint="@string/note" />
+    </android.support.design.widget.TextInputLayout>
 </LinearLayout>

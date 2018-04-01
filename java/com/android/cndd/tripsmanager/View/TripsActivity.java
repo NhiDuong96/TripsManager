@@ -15,8 +15,8 @@ import com.android.cndd.tripsmanager.R;
  * Created by Minh Nhi on 3/10/2018.
  */
 
-public class MainActivity extends AppCompatActivity implements TripsListFragment.OnItemSelectedListener{
-    private static final String TAG = "MainActivity";
+public class TripsActivity extends AppCompatActivity implements TripsListFragment.OnItemSelectedListener{
+    private static final String TAG = "TripsActivity";
     public static final String TRIP = "trip";
 
     @Override

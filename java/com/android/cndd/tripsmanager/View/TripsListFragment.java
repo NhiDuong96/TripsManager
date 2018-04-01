@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
+import android.widget.TextView;
 
 import com.android.cndd.tripsmanager.Model.ITripViewer;
 import com.android.cndd.tripsmanager.Model.Trip;
@@ -48,6 +49,8 @@ public class TripsListFragment extends Fragment {
     private TripViewModel tripViewModel;
 
     private TripViewModel.TripLiveData dataLiveUpdateUI;
+
+    private TabHost tabs;
 
     public interface OnItemSelectedListener{
         void onItemSelectedListener(ITripViewer viewer);
@@ -105,12 +108,15 @@ public class TripsListFragment extends Fragment {
         listView.setLayoutManager(layoutManager);
 
         backgroundContainer = v.findViewById(R.id.listViewBackground);
-        TabHost tabs = v.findViewById(R.id.tabhost);
-        setTagHost(tabs);
+        tabs = v.findViewById(R.id.tabhost);
+        setTagHost();
         FloatingActionButton fab = v.findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
             //create a new trip
             Intent intent = new Intent(getContext(),TripsCreateActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putInt("action",0);
+            intent.putExtra("trip_update", bundle);
             startActivity(intent);
         });
         return v;
@@ -136,22 +142,26 @@ public class TripsListFragment extends Fragment {
         listener = null;
     }
 
-    private void setTagHost(TabHost tabs) {
+    private void setTagHost() {
         tabs.setup();
 
-        TabHost.TabSpec active = tabs.newTabSpec("active");
-        active.setIndicator("active");
-        active.setContent(R.id.layout1);
-        tabs.addTab(active);
+        setupTab("active",R.id.layout1);
+        setupTab("follow",R.id.layout2);
+        setupTab("past",R.id.layout3);
+    }
 
-        TabHost.TabSpec past = tabs.newTabSpec("past");
-        past.setIndicator("past");
-        past.setContent(R.id.layout2);
-        tabs.addTab(past);
+    private void setupTab(String tag, int layoutId) {
+        View tabview = createTabView(tabs.getContext(), tag);
+        TabHost.TabSpec setContent = tabs.newTabSpec(tag)
+                                    .setIndicator(tabview)
+                                    .setContent(layoutId);
+        tabs.addTab(setContent);
+    }
 
-        TabHost.TabSpec follow = tabs.newTabSpec("follow");
-        follow.setIndicator("follow");
-        follow.setContent(R.id.layout3);
-        tabs.addTab(follow);
+    private static View createTabView(final Context context, final String text) {
+        View view = LayoutInflater.from(context).inflate(R.layout.tabs_background, null);
+        TextView tv = view.findViewById(R.id.tabsText);
+        tv.setText(text);
+        return view;
     }
 }

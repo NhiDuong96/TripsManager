@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:id="@+id/move_to_back_container">
 
-    <fragment class="com.android.cndd.tripsmanager.ViewHelper.ImageFragment"
+    <fragment class="com.android.cndd.tripsmanager.View.PlanDetailsFragment"
         android:id="@+id/move_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

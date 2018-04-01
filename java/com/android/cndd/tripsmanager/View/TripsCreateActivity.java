@@ -9,8 +9,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AutoCompleteTextView;
+import android.widget.DatePicker;
 import android.widget.EditText;
 
+import com.android.cndd.tripsmanager.Model.ITripViewer;
 import com.android.cndd.tripsmanager.Model.Trip;
 import com.android.cndd.tripsmanager.R;
 import com.android.cndd.tripsmanager.ViewHelper.PickDate;
@@ -36,7 +38,7 @@ public class TripsCreateActivity extends AppCompatActivity {
 
     private PlaceAutocompleteAdapter mAdapter;
 
-    private AutoCompleteTextView mAutoCOmpleteTextView;
+    private AutoCompleteTextView mDestination;
 
     private EditText mTitle, mDescription, mStartDate, mStartTime, mEndDate, mEndTime;
 
@@ -44,6 +46,10 @@ public class TripsCreateActivity extends AppCompatActivity {
 
     private ProgressDialog saveProgress;
 
+    private int mAction;
+    private int mTripId;
+
+    private TripViewModel tripViewModel;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +60,7 @@ public class TripsCreateActivity extends AppCompatActivity {
         //trips title
         mTitle = findViewById(R.id.title);
         //trips destination name
-        mAutoCOmpleteTextView = findViewById(R.id.destination);
+        mDestination = findViewById(R.id.destination);
         //
         startDate = new Date();
         endDate = new Date();
@@ -73,8 +79,28 @@ public class TripsCreateActivity extends AppCompatActivity {
         //description
         mDescription = findViewById(R.id.description);
 
+        tripViewModel = ViewModelProviders.of(this).get(TripViewModel.class);
+
+        Bundle bundle = getIntent().getBundleExtra("trip_update");
+        mAction = bundle.getInt("action");
+        if(mAction == 1){
+            ITripViewer viewer = (ITripViewer) bundle.getSerializable("trip");
+            if(viewer != null){
+                mTripId = viewer.getId();
+                Trip trip = tripViewModel.getTripFromId(mTripId);
+                mTitle.setText(trip.getTitle());
+                mDestination.setText(trip.getDestination());
+                mStartDate.setText(PickDate.convertToDate(trip.getStartTime()));
+                mStartTime.setText(PickDate.convertToTime(trip.getStartTime()));
+                mEndDate.setText(PickDate.convertToDate(trip.getEndTime()));
+                mEndTime.setText(PickDate.convertToTime(trip.getEndTime()));
+                mDescription.setText(trip.getDescription());
+            }
+        }
+
+
         mAdapter = new PlaceAutocompleteAdapter(this ,mGeoDataClient, null, null);
-        mAutoCOmpleteTextView.setAdapter(mAdapter);
+        mDestination.setAdapter(mAdapter);
     }
 
 
@@ -89,9 +115,15 @@ public class TripsCreateActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.save:
                 Log.e(TAG, "onOptionsItemSelected: save");
-                Trip trip = getObj();
-                TripViewModel model = ViewModelProviders.of(this).get(TripViewModel.class);
-                Query<Trip> query = new QueryFactory.InsertOperation<>(model, trip);
+                Query<Trip> query;
+                if(mAction == 0){
+                    Trip trip = getObj(-1);
+                    query = new QueryFactory.InsertOperation<>(tripViewModel, trip);
+                }else{
+                    Trip trip = getObj(mTripId);
+                    query = new QueryFactory.UpdateOperation<>(tripViewModel,trip);
+                }
+
                 query.setUpdateUICode(1000);
                 QueryTransaction transaction = QueryTransaction.getTransaction();
                 transaction.execOnBackground(query, observer);
@@ -130,13 +162,14 @@ public class TripsCreateActivity extends AppCompatActivity {
         }
     };
 
-    public Trip getObj(){
-        return new Trip(
-                mTitle.getText().toString(),
-                mAutoCOmpleteTextView.getText().toString(),
-                startDate,endDate,
-                null,
-                null,
-                mDescription.getText().toString());
+    public Trip getObj(int trip_id){
+        Trip trip = new Trip();
+        if(mAction == 1) trip.setId(trip_id);
+        trip.setTitle(mTitle.getText().toString());
+        trip.setDestination(mDestination.getText().toString());
+        trip.setStartTime(startDate);
+        trip.setEndTime(endDate);
+        trip.setDescription(mDescription.getText().toString());
+        return trip;
     }
 }

@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".View.MainActivity"
+            android:name=".View.TripsActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,7 +32,7 @@
             android:label="@string/add_trip">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".View.MainActivity"/>
+                android:value=".View.TripsActivity"/>
         </activity>
 
         <activity android:name=".View.PlanCategoryActivity"
@@ -42,16 +42,18 @@
                 android:value=".View.PlansActivity"/>
         </activity>
 
-        <activity android:name=".View.MeetingCreateActivity" >
+        <activity android:name=".View.MeetingCreateActivity"
+                android:label="@string/add_meeting">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".View.PlanCategoryActivity"/>
         </activity>
 
-        <activity android:name=".View.PlansActivity" >
+        <activity android:name=".View.PlansActivity"
+                android:label="@string/plan_name">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".View.MainActivity"/>
+                android:value=".View.TripsActivity"/>
         </activity>
         <activity android:name=".ViewHelper.MarkerDemoActivity" />
 

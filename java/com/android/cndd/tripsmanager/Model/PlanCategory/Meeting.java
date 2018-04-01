@@ -65,7 +65,7 @@ public class Meeting implements IPlanViewer {
 
     @Override
     public String getDate() {
-        SimpleDateFormat fm = new SimpleDateFormat("E, 'THG' MM dd");
+        SimpleDateFormat fm = new SimpleDateFormat("E,dd 'Thg' MM");
         return fm.format(startTime);
     }
 
@@ -126,7 +126,7 @@ public class Meeting implements IPlanViewer {
     @Override
     public String toHtmlLayout() {
         return "<html>" +
-                "<body>" +
+                "<body style=\"background-color: #26A69A;\">" +
                 "<h1 style=\"text-align:center; color: blue\">Meeting</h1>" +
                 "<p>Description: " +description+"</p>" +
                 "<p>Location Name: " +locationName+"</p>" +

@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 
 import com.android.cndd.tripsmanager.Model.Option.Priority;
 import com.android.cndd.tripsmanager.Model.Option.Status;
+import com.android.cndd.tripsmanager.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,6 +38,8 @@ public class Trip implements ITripViewer{
 
     private String description;
 
+    public Trip(){}
+
     public Trip(@NonNull String title, String destination, Date startTime,
                 Date endTime, Priority priority, Status status, String description) {
         this.title = title;
@@ -58,6 +61,7 @@ public class Trip implements ITripViewer{
         return null;
     }
 
+
     @NonNull
     @Override
     public String getTitle() {
@@ -66,13 +70,14 @@ public class Trip implements ITripViewer{
 
     @Override
     public String getTime() {
-        SimpleDateFormat fm = new SimpleDateFormat("E,dd 'thg' MM,yyyy");
+        SimpleDateFormat fm = new SimpleDateFormat("dd/MM/yyyy");
         return fm.format(startTime) + " - " + fm.format(endTime);
     }
 
     @Override
     public String getInterval() {
-        return "1 day";
+        long numOfDay = (endTime.getTime() - startTime.getTime())/(1000*60*60*24) + 1;
+        return String.valueOf(numOfDay) + ((numOfDay <= 1)? " day" : " days");
     }
 
     public String getDestination() {

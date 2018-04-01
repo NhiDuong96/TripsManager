@@ -8,9 +8,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.android.cndd.tripsmanager.Model.IPlanViewer;
 import com.android.cndd.tripsmanager.Model.Option.PlanCategories;
@@ -34,6 +37,7 @@ import com.google.android.gms.maps.model.RuntimeRemoteException;
 import com.google.android.gms.tasks.Task;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -50,7 +54,7 @@ public class MeetingCreateActivity extends AppCompatActivity {
 
     private AutoCompleteTextView mLocationName;
 
-    private EditText description,address,startDate,startTime, endDate, endTime;
+    private EditText type, description,address,startDate,startTime, endDate, endTime;
 
     private Date startDateTime, endDateTime;
 
@@ -64,6 +68,8 @@ public class MeetingCreateActivity extends AppCompatActivity {
     private Meeting currentMeeting;
 
     private ProgressDialog saveProgress;
+
+    private String[] arr = {"Activity", "Meeting", "Tour", "Concert", "Theatre"};
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +77,11 @@ public class MeetingCreateActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mGeoDataClient = Places.getGeoDataClient(this,null);
+
+        Spinner spinner = findViewById(R.id.spinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, arr);
+        adapter.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
+        spinner.setAdapter(adapter);
 
         mLocationName = findViewById(R.id.location_name);
 
