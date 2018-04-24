@@ -22,8 +22,9 @@ import com.android.cndd.tripsmanager.Model.ITripViewer;
 import com.android.cndd.tripsmanager.Model.Trip;
 import com.android.cndd.tripsmanager.R;
 import com.android.cndd.tripsmanager.ViewHelper.BackgroundContainer;
-import com.android.cndd.tripsmanager.ViewHelper.OnActionTouchItemListener;
-import com.android.cndd.tripsmanager.ViewHelper.TripsCardViewAdapter;
+import com.android.cndd.tripsmanager.ViewHelper.IViewAdapter;
+import com.android.cndd.tripsmanager.ViewHelper.OnInteractItemListener;
+import com.android.cndd.tripsmanager.ViewHelper.TripsCardViewViewAdapter;
 import com.android.cndd.tripsmanager.ViewModel.Query;
 import com.android.cndd.tripsmanager.ViewModel.QueryFactory;
 import com.android.cndd.tripsmanager.ViewModel.QueryTransaction;
@@ -33,12 +34,13 @@ import com.android.cndd.tripsmanager.ViewModel.TripViewModel;
  * Created by Minh Nhi on 3/10/2018.
  */
 
-public class TripsListFragment extends Fragment {
+public class TripsListFragment extends Fragment
+        implements OnInteractItemListener.OnInteractItemAdapter<ITripViewer>{
     private static final String TAG = "TripsListFragment";
 
     private Context context;
 
-    private TripsCardViewAdapter tripsAdapter;
+    private TripsCardViewViewAdapter tripsAdapter;
 
     private RecyclerView listView;
 
@@ -51,6 +53,7 @@ public class TripsListFragment extends Fragment {
     private TripViewModel.TripLiveData dataLiveUpdateUI;
 
     private TabHost tabs;
+
 
     public interface OnItemSelectedListener{
         void onItemSelectedListener(ITripViewer viewer);
@@ -67,35 +70,15 @@ public class TripsListFragment extends Fragment {
             if(tripsAdapter == null){
                 context = getContext();
                 if(context == null || listTrips == null) return;
-                tripsAdapter = new TripsCardViewAdapter(R.layout.trips_item_layout, listTrips);
+                tripsAdapter = new TripsCardViewViewAdapter(R.layout.trips_item_layout, listTrips);
                 listView.setAdapter(tripsAdapter);
 
-                OnActionTouchItemListener removalTouchListener =
-                        new OnActionTouchItemListener<ITripViewer>(context, listView,tripsAdapter,backgroundContainer){
-                            @Override
-                            protected void onRemoveItem(ITripViewer item) {
-                                removeItem(item);
-                            }
-
-                            @Override
-                            protected void onTouchItem(ITripViewer item) {
-                                listener.onItemSelectedListener(item);
-                            }
-                        };
-                tripsAdapter.setOnTouchListener(removalTouchListener);
+                tripsAdapter.setOnTouchListener(new OnInteractItemListener<>(context,this ));
             }else{
-                Log.e(TAG, "onActivityCreated: data set changed");
+                Log.e(TAG, "Trips update: data set changed");
                 tripsAdapter.notifyDataSetChanged();
             }
         });
-    }
-
-    public void removeItem(ITripViewer viewer){
-        Trip trip = tripViewModel.getTripFromId(viewer.getId());
-        Query<Trip> query = new QueryFactory.DeleteOperation<>(tripViewModel ,trip);
-        query.setUpdateUIListener(dataLiveUpdateUI);
-        query.setArguments(viewer);
-        QueryTransaction.getTransaction().execOnMainThread(query);
     }
 
     @Nullable
@@ -163,5 +146,34 @@ public class TripsListFragment extends Fragment {
         TextView tv = view.findViewById(R.id.tabsText);
         tv.setText(text);
         return view;
+    }
+
+
+    @Override
+    public RecyclerView getViewList() {
+        return listView;
+    }
+
+    @Override
+    public IViewAdapter<ITripViewer> getViewAdapter() {
+        return tripsAdapter;
+    }
+
+    @Override
+    public BackgroundContainer getBackgroundContainer() {
+        return backgroundContainer;
+    }
+
+    @Override
+    public void onRemovedItem(ITripViewer item) {
+        Trip trip = tripViewModel.getTripFromId(item.getId());
+        Query query = QueryFactory.initOperation(QueryFactory.DELETE, tripViewModel ,trip);
+        query.setArguments(item);
+        QueryTransaction.getTransaction().execOnMainThread(query);
+    }
+
+    @Override
+    public void onSeletedItem(ITripViewer item) {
+        listener.onItemSelectedListener(item);
     }
 }

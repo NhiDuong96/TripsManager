@@ -1,4 +1,4 @@
-package com.android.cndd.tripsmanager.Model;
+package com.android.cndd.tripsmanager.EntityDao;
 
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
@@ -6,10 +6,9 @@ import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
-import com.android.cndd.tripsmanager.Model.EntityDao.MeetingDao;
-import com.android.cndd.tripsmanager.Model.EntityDao.PlanDao;
-import com.android.cndd.tripsmanager.Model.EntityDao.TripDao;
+import com.android.cndd.tripsmanager.Model.Plan;
 import com.android.cndd.tripsmanager.Model.PlanCategory.Meeting;
+import com.android.cndd.tripsmanager.Model.Trip;
 
 
 /**

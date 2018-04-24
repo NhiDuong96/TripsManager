@@ -1,10 +1,10 @@
-package com.android.cndd.tripsmanager.Model;
+package com.android.cndd.tripsmanager.EntityDao;
 
 import android.arch.persistence.room.TypeConverter;
 
-import com.android.cndd.tripsmanager.Model.Option.PlanCategories;
-import com.android.cndd.tripsmanager.Model.Option.Priority;
-import com.android.cndd.tripsmanager.Model.Option.Status;
+import com.android.cndd.tripsmanager.Model.PlanCategories;
+import com.android.cndd.tripsmanager.Model.Priority;
+import com.android.cndd.tripsmanager.Model.Status;
 
 import java.util.Date;
 

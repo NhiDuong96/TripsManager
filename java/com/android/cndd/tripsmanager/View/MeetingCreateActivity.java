@@ -8,20 +8,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.android.cndd.tripsmanager.Model.IPlanViewer;
-import com.android.cndd.tripsmanager.Model.Option.PlanCategories;
+import com.android.cndd.tripsmanager.Model.PlanCategories;
 import com.android.cndd.tripsmanager.Model.Plan;
 import com.android.cndd.tripsmanager.Model.PlanCategory.Meeting;
 import com.android.cndd.tripsmanager.ViewHelper.PickDate;
 import com.android.cndd.tripsmanager.R;
-import com.android.cndd.tripsmanager.ViewModel.IQueryViewObserver;
 import com.android.cndd.tripsmanager.ViewModel.IQueryViewObserverAdapter;
 import com.android.cndd.tripsmanager.ViewModel.MeetingViewModel;
 import com.android.cndd.tripsmanager.ViewModel.PlanViewModel;
@@ -33,12 +30,11 @@ import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBufferResponse;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.RuntimeRemoteException;
 import com.google.android.gms.tasks.Task;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by Minh Nhi on 3/8/2018.
@@ -58,6 +54,8 @@ public class MeetingCreateActivity extends AppCompatActivity {
 
     private Date startDateTime, endDateTime;
 
+    private LatLng mLatLng;
+
     private int mTripId;
     private int mActionId;
     private int mPlanId;
@@ -70,6 +68,7 @@ public class MeetingCreateActivity extends AppCompatActivity {
     private ProgressDialog saveProgress;
 
     private String[] arr = {"Activity", "Meeting", "Tour", "Concert", "Theatre"};
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -137,7 +136,7 @@ public class MeetingCreateActivity extends AppCompatActivity {
                 final Place place = places.get(0);
                 //set UI here
                 address.setText(place.getAddress());
-
+                mLatLng = place.getLatLng();
                 places.release();
             } catch (RuntimeRemoteException e) {
                 // Request did not complete successfully
@@ -156,11 +155,11 @@ public class MeetingCreateActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.save:
                 Log.e(TAG, "onOptionsItemSelected: save");
-                Query<Plan> query;
+                Query query;
                 if(mActionId == 0)
-                    query = new QueryFactory.InsertOperation<>(planLiveData, new Plan(mTripId, PlanCategories.Meeting));
+                    query = QueryFactory.initOperation(QueryFactory.INSERT, planLiveData, new Plan(mTripId, PlanCategories.Meeting));
                 else{
-                    query = new QueryFactory.UpdateOperation<>(planLiveData, planLiveData.getPlanById(mPlanId));
+                    query = QueryFactory.initOperation(QueryFactory.UPDATE, planLiveData, planLiveData.getPlanById(mPlanId));
                 }
                 QueryTransaction.getTransaction().execOnBackground(query, new IQueryViewObserverAdapter() {
                     @Override
@@ -185,16 +184,15 @@ public class MeetingCreateActivity extends AppCompatActivity {
     }
 
     public void savePlan(){
-        Query<Meeting> query;
+        Query query;
         if(mActionId == 0){
             Meeting meeting = getMeeting(planLiveData.getLastItem().getId(), -1);
-            query = new QueryFactory.InsertOperation<>(meetingViewModel, meeting);
+            query = QueryFactory.initOperation(QueryFactory.INSERT, meetingViewModel, meeting);
         }else{
             Meeting meeting = getMeeting(mPlanId, currentMeeting.getId());
-            query = new QueryFactory.UpdateOperation<>(meetingViewModel, meeting);
+            query = QueryFactory.initOperation(QueryFactory.UPDATE, meetingViewModel, meeting);
             query.setArguments(mPlanId);
         }
-        query.setUpdateUICode(1001);
         QueryTransaction.getTransaction().execOnBackground(query, new IQueryViewObserverAdapter() {
             @Override
             public void onEndQuery() {
@@ -216,6 +214,8 @@ public class MeetingCreateActivity extends AppCompatActivity {
         meeting.setDescription(description.getText().toString());
         meeting.setLocationName(mLocationName.getText().toString());
         meeting.setAddress(address.getText().toString());
+        meeting.setLatitude(mLatLng.latitude);
+        meeting.setLongitude(mLatLng.longitude);
         meeting.setStartTime(startDateTime);
         meeting.setEndTime(endDateTime);
         return meeting;

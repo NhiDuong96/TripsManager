@@ -1,4 +1,4 @@
-package com.android.cndd.tripsmanager.Model.EntityDao;
+package com.android.cndd.tripsmanager.EntityDao;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Query;

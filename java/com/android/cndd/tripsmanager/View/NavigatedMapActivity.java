@@ -1,11 +1,15 @@
-package com.android.cndd.tripsmanager.ViewHelper;
+package com.android.cndd.tripsmanager.View;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -14,11 +18,13 @@ import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
+import com.android.cndd.tripsmanager.Model.IPlanViewer;
 import com.android.cndd.tripsmanager.Modules.DirectionFinder;
 import com.android.cndd.tripsmanager.Modules.DirectionFinderListener;
 import com.android.cndd.tripsmanager.Modules.Route;
 import com.android.cndd.tripsmanager.View.PlaceAutocompleteAdapter;
 import com.android.cndd.tripsmanager.R;
+import com.android.cndd.tripsmanager.ViewModel.PlanViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.AutocompletePrediction;
@@ -47,10 +53,11 @@ import java.util.List;
  * Created by Minh Nhi on 3/15/2018.
  */
 
-public class MarkerDemoActivity extends FragmentActivity implements
+public class NavigatedMapActivity extends FragmentActivity implements
         GoogleMap.OnMarkerClickListener,
         DirectionFinderListener,
         OnMapReadyCallback {
+    private static final String TAG = "NavigatedMapActivity";
 
     private GeoDataClient mGeoDataClient;
 
@@ -65,6 +72,8 @@ public class MarkerDemoActivity extends FragmentActivity implements
     private GoogleMap mMap;
 
     private ProgressDialog progressDialog;
+
+    private IPlanViewer planViewer;
 
     private List<Marker> originMarkers = new ArrayList<>();
     private List<Marker> destinationMarkers = new ArrayList<>();
@@ -83,6 +92,12 @@ public class MarkerDemoActivity extends FragmentActivity implements
         //trips destination name
         mAutoCOmpleteTextView = findViewById(R.id.destination);
 
+        Bundle bundle = getIntent().getBundleExtra("plan");
+
+        planViewer = (IPlanViewer) bundle.getSerializable("viewer");
+
+        mAutoCOmpleteTextView.setText(planViewer.getInformation());
+
         mAdapter = new PlaceAutocompleteAdapter(this, mGeoDataClient, null, null);
         mAutoCOmpleteTextView.setAdapter(mAdapter);
         mAutoCOmpleteTextView.setOnItemClickListener(itemClickListener);
@@ -91,6 +106,8 @@ public class MarkerDemoActivity extends FragmentActivity implements
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
         mapFragment.getMapAsync(this);
+
+        turnGPSOn();
     }
 
 
@@ -113,8 +130,8 @@ public class MarkerDemoActivity extends FragmentActivity implements
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;
-        // Set a listener for marker click.
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(16.077019, 108.152780), 13));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(16.077019, 108.152780), 13));
+
         mMap.setOnMarkerClickListener(this);
     }
 
@@ -131,6 +148,7 @@ public class MarkerDemoActivity extends FragmentActivity implements
                     if (task.isSuccessful() && task.getResult() != null) {
                         Location location = task.getResult();
                         mMyLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                        sendRequest(mMyLocation , planViewer.getLatLng());
                     } else {
                     }
                 });
@@ -163,6 +181,19 @@ public class MarkerDemoActivity extends FragmentActivity implements
                     Toast.LENGTH_SHORT).show();
         }
         return false;
+    }
+
+    private void turnGPSOn(){
+        int off = 0;
+        try {
+            off = Settings.Secure.getInt(getContentResolver(), Settings.Secure.LOCATION_MODE);
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+        if(off==0){
+            Intent onGPS = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(onGPS);
+        }
     }
 
 

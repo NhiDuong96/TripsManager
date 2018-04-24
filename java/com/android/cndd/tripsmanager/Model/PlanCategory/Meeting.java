@@ -6,9 +6,10 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.android.cndd.tripsmanager.Model.IPlanViewer;
-import com.android.cndd.tripsmanager.Model.Option.PlanCategories;
+import com.android.cndd.tripsmanager.Model.PlanCategories;
 import com.android.cndd.tripsmanager.Model.Plan;
 import com.android.cndd.tripsmanager.R;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,9 +39,14 @@ public class Meeting implements IPlanViewer {
 
     private String address;
 
+    private double latitude;
+
+    private double longitude;
+
     private Date startTime;
 
     private Date endTime;
+
 
     @Override
     public int getId() {
@@ -67,6 +73,11 @@ public class Meeting implements IPlanViewer {
     public String getDate() {
         SimpleDateFormat fm = new SimpleDateFormat("E,dd 'Thg' MM");
         return fm.format(startTime);
+    }
+
+    @Override
+    public LatLng getLatLng() {
+        return new LatLng(latitude, longitude);
     }
 
     @Override
@@ -105,6 +116,22 @@ public class Meeting implements IPlanViewer {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     public Date getStartTime() {

@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.android.cndd.tripsmanager.Model.Option.PlanCategories;
+import com.android.cndd.tripsmanager.Model.PlanCategories;
 import com.android.cndd.tripsmanager.R;
 
 /**

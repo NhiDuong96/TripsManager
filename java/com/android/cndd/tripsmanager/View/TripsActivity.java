@@ -10,6 +10,9 @@ import android.util.Log;
 
 import com.android.cndd.tripsmanager.Model.ITripViewer;
 import com.android.cndd.tripsmanager.R;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.SignInAccount;
 
 /**
  * Created by Minh Nhi on 3/10/2018.
@@ -20,9 +23,20 @@ public class TripsActivity extends AppCompatActivity implements TripsListFragmen
     public static final String TRIP = "trip";
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if(account == null){
+            Intent intent = new Intent(this, SignInActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.trips_activity_layout);
+
 
         getSupportFragmentManager()
                 .beginTransaction()

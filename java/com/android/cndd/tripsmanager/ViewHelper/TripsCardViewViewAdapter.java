@@ -18,14 +18,14 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by Minh Nhi on 3/22/2018.
  */
 
-public class TripsCardViewAdapter extends RecyclerView.Adapter<TripsCardViewAdapter.ViewHolder>
-    implements IAdapterHelper<ITripViewer> {
+public class TripsCardViewViewAdapter extends RecyclerView.Adapter<TripsCardViewViewAdapter.ViewHolder>
+    implements IViewAdapter<ITripViewer> {
 
     private int resLayoutId;
     private List<ITripViewer> list;
     private View.OnTouchListener mTouchListener;
 
-    public TripsCardViewAdapter(int resLayoutId, List<ITripViewer> list){
+    public TripsCardViewViewAdapter(int resLayoutId, List<ITripViewer> list){
         this.resLayoutId = resLayoutId;
         this.list = list;
     }

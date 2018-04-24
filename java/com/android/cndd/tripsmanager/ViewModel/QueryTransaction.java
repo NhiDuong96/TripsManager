@@ -5,8 +5,6 @@ import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 /**
@@ -14,6 +12,7 @@ import java.util.Stack;
  */
 
 public class QueryTransaction {
+    private static final String TAG = "QueryTransaction";
 
     private Stack<Query> queryStack;
     private static QueryTransaction transaction;
@@ -69,11 +68,11 @@ public class QueryTransaction {
           }.execute(query);
     }
 
-    public void requestForUpdate(IQueryUIObserver observer){
-        if(observer == null) return;
+    public void requestForUpdate(UpdateUIListener observer){
         for(Query query : queryStack){
-            if(query.CODE == observer.getUpdateUICode()){
-                query.response(observer);
+            if(query.equals(observer)){
+                query.updateUI(observer);
+                query.allowQueryUpdateUi(false);
             }
         }
     }

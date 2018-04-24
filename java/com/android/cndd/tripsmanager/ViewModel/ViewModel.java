@@ -4,13 +4,13 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.support.annotation.NonNull;
 
-import com.android.cndd.tripsmanager.Model.DBContext;
+import com.android.cndd.tripsmanager.EntityDao.DBContext;
 
 /**
  * Created by Minh Nhi on 3/23/2018.
  */
 
-public abstract class ViewModel<T> extends AndroidViewModel {
+public abstract class ViewModel extends AndroidViewModel {
     private static final String TAG = "ViewModel";
     private DBContext mDBContext;
 
@@ -23,7 +23,11 @@ public abstract class ViewModel<T> extends AndroidViewModel {
         return mDBContext;
     }
 
-    public abstract void Insert(T obj);
-    public abstract void Delete(T obj);
-    public abstract void Update(T obj);
+    public abstract void Insert(Object obj);
+    public abstract void Delete(Object obj);
+    public abstract void Update(Object obj);
+
+    public UpdateUIListener getUpdateUIListener(){
+        return null;
+    }
 }

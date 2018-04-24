@@ -5,9 +5,6 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 
-import com.android.cndd.tripsmanager.Model.Option.PlanCategories;
-import com.android.cndd.tripsmanager.Model.Option.Status;
-
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 /**

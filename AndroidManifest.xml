@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-feature android:name="android.hardware.location.gps" />
 
     <application
         android:allowBackup="true"
@@ -35,6 +36,13 @@
                 android:value=".View.TripsActivity"/>
         </activity>
 
+        <activity android:name=".View.PlansActivity"
+            android:label="@string/plan_name">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".View.TripsActivity"/>
+        </activity>
+
         <activity android:name=".View.PlanCategoryActivity"
             android:label="@string/plan_category">
             <meta-data
@@ -46,16 +54,12 @@
                 android:label="@string/add_meeting">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".View.PlanCategoryActivity"/>
+                android:value=".View.PlansActivity"/>
         </activity>
 
-        <activity android:name=".View.PlansActivity"
-                android:label="@string/plan_name">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".View.TripsActivity"/>
-        </activity>
-        <activity android:name=".ViewHelper.MarkerDemoActivity" />
+        <activity android:name=".View.NavigatedMapActivity" />
+
+        <activity android:name=".View.SignInActivity" />
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.

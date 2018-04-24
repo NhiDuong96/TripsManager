@@ -10,7 +10,7 @@
 
     <ImageButton
         android:id="@+id/exit"
-        android:contentDescription="Exit"
+        android:contentDescription="@string/exit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@null"
@@ -21,7 +21,8 @@
         android:id="@+id/content"
         android:layout_below="@+id/exit"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="@string/details"/>
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -31,7 +32,6 @@
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/nagative"
-            android:backgroundTint="#3F51B5"
             android:layout_marginEnd="5dp"
             android:layout_toStartOf="@+id/edit"
             android:src="@android:drawable/ic_dialog_map"
@@ -39,7 +39,6 @@
             android:layout_height="wrap_content" />
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/edit"
-            android:backgroundTint="#009688"
             android:layout_toStartOf="@+id/delete"
             android:layout_marginEnd="5dp"
             android:src="@android:drawable/ic_menu_edit"

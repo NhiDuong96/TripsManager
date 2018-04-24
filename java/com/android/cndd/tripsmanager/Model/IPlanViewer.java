@@ -1,5 +1,7 @@
 package com.android.cndd.tripsmanager.Model;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.Serializable;
 
 /**
@@ -16,6 +18,8 @@ public interface IPlanViewer extends Serializable {
     String getTime();
 
     String getDate();
+
+    LatLng getLatLng();
 
     String getInformation();
 

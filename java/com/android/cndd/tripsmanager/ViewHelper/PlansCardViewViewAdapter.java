@@ -17,14 +17,14 @@ import java.util.List;
  * Created by Minh Nhi on 3/22/2018.
  */
 
-public class PlansCardViewAdapter extends RecyclerView.Adapter<PlansCardViewAdapter.ViewHolder>
-    implements IAdapterHelper<IPlanViewer> {
+public class PlansCardViewViewAdapter extends RecyclerView.Adapter<PlansCardViewViewAdapter.ViewHolder>
+    implements IViewAdapter<IPlanViewer> {
 
     private int resLayoutId;
     private List<IPlanViewer> list;
     private View.OnTouchListener mTouchListener;
 
-    public PlansCardViewAdapter(int resLayoutId, List<IPlanViewer> list){
+    public PlansCardViewViewAdapter(int resLayoutId, List<IPlanViewer> list){
         this.resLayoutId = resLayoutId;
         this.list = list;
     }

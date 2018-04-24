@@ -6,10 +6,6 @@ import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
-import com.android.cndd.tripsmanager.Model.Option.Priority;
-import com.android.cndd.tripsmanager.Model.Option.Status;
-import com.android.cndd.tripsmanager.R;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 

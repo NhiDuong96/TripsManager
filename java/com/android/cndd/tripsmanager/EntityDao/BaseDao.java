@@ -1,4 +1,4 @@
-package com.android.cndd.tripsmanager.Model.EntityDao;
+package com.android.cndd.tripsmanager.EntityDao;
 
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;

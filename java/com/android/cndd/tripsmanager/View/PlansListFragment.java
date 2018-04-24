@@ -10,19 +10,21 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.cndd.tripsmanager.Model.IPlanViewer;
 import com.android.cndd.tripsmanager.Model.ITripViewer;
-import com.android.cndd.tripsmanager.Model.Option.PlanCategories;
+import com.android.cndd.tripsmanager.Model.PlanCategories;
 import com.android.cndd.tripsmanager.Model.Plan;
 import com.android.cndd.tripsmanager.R;
 import com.android.cndd.tripsmanager.ViewHelper.BackgroundContainer;
-import com.android.cndd.tripsmanager.ViewHelper.OnActionTouchItemListener;
+import com.android.cndd.tripsmanager.ViewHelper.IViewAdapter;
+import com.android.cndd.tripsmanager.ViewHelper.OnInteractItemListener;
 import com.android.cndd.tripsmanager.ViewHelper.OnFragmentAnimationStartListener;
-import com.android.cndd.tripsmanager.ViewHelper.PlansCardViewAdapter;
+import com.android.cndd.tripsmanager.ViewHelper.PlansCardViewViewAdapter;
 import com.android.cndd.tripsmanager.ViewModel.PlanViewModel;
 import com.android.cndd.tripsmanager.ViewModel.Query;
 import com.android.cndd.tripsmanager.ViewModel.QueryFactory;
@@ -34,7 +36,7 @@ import static android.app.Activity.RESULT_OK;
  * Created by Minh Nhi on 3/10/2018.
  */
 
-public class PlansListFragment extends Fragment {
+public class PlansListFragment extends Fragment implements OnInteractItemListener.OnInteractItemAdapter<IPlanViewer> {
     public static final String TAG = "PlansListFragment";
 
     public static final int REQUEST = 1001;
@@ -43,7 +45,7 @@ public class PlansListFragment extends Fragment {
 
     private RecyclerView listView;
 
-    private PlansCardViewAdapter adapter;
+    private PlansCardViewViewAdapter adapter;
 
     private ITripViewer mTripViewer;
 
@@ -58,28 +60,19 @@ public class PlansListFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         planViewModel = ViewModelProviders.of(getActivity()).get(PlanViewModel.class);
-        planLiveData = planViewModel.getPlanLiveData(mTripViewer.getId());
+
+        planLiveData = planViewModel.initPlanLiveData(mTripViewer.getId());
         planLiveData.observe(this,(listPlans) -> {
+            Log.e(TAG, "onActivityCreated: Update ui");
             if(adapter == null){
+                Log.e(TAG, "onActivityCreated: Update ui first");
                 context = getContext();
                 if(context == null || listPlans == null) return;
-                adapter = new PlansCardViewAdapter(R.layout.plans_item_layout,listPlans);
+                adapter = new PlansCardViewViewAdapter(R.layout.plans_item_layout,listPlans);
                 listView.setAdapter(adapter);
-                OnActionTouchItemListener listener =
-                        new OnActionTouchItemListener<IPlanViewer>(context, listView, adapter,backgroundContainer) {
-                            @Override
-                            protected void onRemoveItem(IPlanViewer viewer) {
-                                removeItem(viewer);
-                            }
-
-                            @Override
-                            protected void onTouchItem(IPlanViewer viewer) {
-                                planViewModel.select(viewer);
-                                startAnimation.onAnimationStart();
-                            }
-                        };
-                adapter.setOnTouchListener(listener);
+                adapter.setOnTouchListener(new OnInteractItemListener<>(context,this));
             }
             else {
                 adapter.notifyDataSetChanged();
@@ -87,13 +80,6 @@ public class PlansListFragment extends Fragment {
         });
     }
 
-    public void removeItem(IPlanViewer viewer){
-        Plan plan = planViewModel.getPlanById(viewer.getId());
-        Query<Plan> query = new QueryFactory.DeleteOperation<>(planViewModel, plan);
-        query.setUpdateUIListener(planLiveData);
-        query.setArguments(viewer);
-        QueryTransaction.getTransaction().execOnMainThread(query);
-    }
 
     @Nullable
     @Override
@@ -104,7 +90,7 @@ public class PlansListFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         listView.setLayoutManager(layoutManager);
 
-        Bundle bundle = getArguments();
+        Bundle bundle = getActivity().getIntent().getBundleExtra("plans");
         if(bundle != null)
             mTripViewer = (ITripViewer) bundle.getSerializable("trip");
         backgroundContainer = v.findViewById(R.id.listViewBackground);
@@ -147,5 +133,34 @@ public class PlansListFragment extends Fragment {
 
     public void setClickListener(OnFragmentAnimationStartListener startAnimation) {
         this.startAnimation = startAnimation;
+    }
+
+    @Override
+    public RecyclerView getViewList() {
+        return listView;
+    }
+
+    @Override
+    public IViewAdapter<IPlanViewer> getViewAdapter() {
+        return adapter;
+    }
+
+    @Override
+    public BackgroundContainer getBackgroundContainer() {
+        return backgroundContainer;
+    }
+
+    @Override
+    public void onRemovedItem(IPlanViewer item) {
+        Plan plan = planViewModel.getPlanById(item.getId());
+        Query query = QueryFactory.initOperation(QueryFactory.DELETE, planViewModel, plan);
+        query.setArguments(item);
+        QueryTransaction.getTransaction().execOnMainThread(query);
+    }
+
+    @Override
+    public void onSeletedItem(IPlanViewer item) {
+        planViewModel.select(item);
+        startAnimation.onAnimationStart();
     }
 }

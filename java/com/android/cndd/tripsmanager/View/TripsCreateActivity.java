@@ -98,7 +98,6 @@ public class TripsCreateActivity extends AppCompatActivity {
             }
         }
 
-
         mAdapter = new PlaceAutocompleteAdapter(this ,mGeoDataClient, null, null);
         mDestination.setAdapter(mAdapter);
     }
@@ -115,18 +114,15 @@ public class TripsCreateActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.save:
                 Log.e(TAG, "onOptionsItemSelected: save");
-                Query<Trip> query;
+                Query query;
                 if(mAction == 0){
                     Trip trip = getObj(-1);
-                    query = new QueryFactory.InsertOperation<>(tripViewModel, trip);
+                    query = QueryFactory.initOperation(QueryFactory.INSERT, tripViewModel, trip);
                 }else{
                     Trip trip = getObj(mTripId);
-                    query = new QueryFactory.UpdateOperation<>(tripViewModel,trip);
+                    query = QueryFactory.initOperation(QueryFactory.UPDATE, tripViewModel,trip);
                 }
-
-                query.setUpdateUICode(1000);
-                QueryTransaction transaction = QueryTransaction.getTransaction();
-                transaction.execOnBackground(query, observer);
+                QueryTransaction.getTransaction().execOnBackground(query, observer);
                 break;
             case android.R.id.home:
                 Log.e(TAG, "onOptionsItemSelected: home");

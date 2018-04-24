@@ -36,8 +36,6 @@ public class PlansActivity extends AppCompatActivity implements
     private PlansListFragment mPlansListFragment;
     private PlanDetailsFragment mPlanDetailsFragment;
     private View mDarkHoverView;
-    private ITripViewer tripViewer;
-    private Bundle bundle;
 
     boolean mDidSlideOut = false;
     boolean mIsAnimating = false;
@@ -51,10 +49,7 @@ public class PlansActivity extends AppCompatActivity implements
         mDarkHoverView = findViewById(R.id.dark_hover_view);
         mDarkHoverView.setAlpha(0);
 
-        bundle = new Bundle();
-        bundle.putAll(getIntent().getBundleExtra("plans"));
         mPlansListFragment = new PlansListFragment();
-        mPlansListFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.move_to_back_container, mPlansListFragment)
                 .commit();
@@ -67,8 +62,6 @@ public class PlansActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-
-        Log.e(TAG, "onResume: " + getSupportFragmentManager().getBackStackEntryCount());
     }
 
     @Override
@@ -117,19 +110,18 @@ public class PlansActivity extends AppCompatActivity implements
             mDidSlideOut = true;
 
             mPlanDetailsFragment = new PlanDetailsFragment();
-            mPlanDetailsFragment.setArguments(bundle);
             mPlanDetailsFragment.setClickListener(mClickListener);
             mPlanDetailsFragment.setOnTextFragmentAnimationEnd(this);
 
             Animator.AnimatorListener listener = new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator arg0) {
-                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.setCustomAnimations(R.animator.slide_fragment_in, 0, 0,
-                            R.animator.slide_fragment_out);
-                    transaction.add(R.id.move_to_back_container, mPlanDetailsFragment);
-                    transaction.addToBackStack(null);
-                    transaction.commit();
+                    getSupportFragmentManager()
+                                .beginTransaction()
+                                .setCustomAnimations(R.animator.slide_fragment_in, 0, 0, R.animator.slide_fragment_out)
+                                .add(R.id.move_to_back_container, mPlanDetailsFragment)
+                                .addToBackStack(null)
+                                .commit();
                 }
             };
             slideBack (listener);

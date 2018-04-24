@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -17,11 +16,21 @@ import java.util.HashMap;
  * Created by Minh Nhi on 3/20/2018.
  */
 
-public abstract class OnActionTouchItemListener<T> implements View.OnTouchListener {
+public class OnInteractItemListener<T> implements View.OnTouchListener {
     private Context mContext;
     private RecyclerView mListView;
     private BackgroundContainer mBackgroundContainer;
-    private IAdapterHelper<T> adapterChanged;
+    private IViewAdapter<T> adapterChanged;
+    private OnInteractItemAdapter<T> interactItemAdapter;
+
+    public interface OnInteractItemAdapter<T>{
+        RecyclerView getViewList();
+        IViewAdapter<T> getViewAdapter();
+        BackgroundContainer getBackgroundContainer();
+
+        void onRemovedItem(T item);
+        void onSeletedItem(T item);
+    }
 
     private boolean mSwiping = false;
     private boolean mItemPressed = false;
@@ -33,22 +42,19 @@ public abstract class OnActionTouchItemListener<T> implements View.OnTouchListen
     private float mDownX;
     private int mSwipeSlop = -1;
 
-    public OnActionTouchItemListener(Context mContext, RecyclerView mListView, IAdapterHelper<T> adapterChanged,
-                                     BackgroundContainer mBackgroundContainer) {
-        if(mContext == null){
-            Log.e("Animation", "null");
-        }
-        this.adapterChanged = adapterChanged;
+    public OnInteractItemListener(Context mContext, OnInteractItemAdapter<T> interactItemAdapter) {
         this.mContext = mContext;
-        this.mListView = mListView;
-        this.mBackgroundContainer = mBackgroundContainer;
+        this.interactItemAdapter = interactItemAdapter;
+        this.adapterChanged = interactItemAdapter.getViewAdapter();
+        this.mListView = interactItemAdapter.getViewList();
+        this.mBackgroundContainer = interactItemAdapter.getBackgroundContainer();
     }
+
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         if (mSwipeSlop < 0) {
-            mSwipeSlop = ViewConfiguration.get(mContext).
-                    getScaledTouchSlop();
+            mSwipeSlop = ViewConfiguration.get(mContext).getScaledTouchSlop();
         }
         switch (event.getAction()) {
 
@@ -150,7 +156,8 @@ public abstract class OnActionTouchItemListener<T> implements View.OnTouchListen
                             });
                 }
                 else{
-                    onTouchItem(adapterChanged.getItem(mListView.getChildPosition(v)));
+                    int position = mListView.getChildPosition(v);
+                    interactItemAdapter.onSeletedItem(adapterChanged.getItem(position));
                 }
             }
             mItemPressed = false;
@@ -172,7 +179,7 @@ public abstract class OnActionTouchItemListener<T> implements View.OnTouchListen
 
         // onDelete the item from the adapter
         int position = listview.getChildPosition(viewToRemove);
-        onRemoveItem(adapterChanged.getItem(position));
+        interactItemAdapter.onRemovedItem(adapterChanged.getItem(position));
 
         //
         final ViewTreeObserver observer = listview.getViewTreeObserver();
@@ -224,7 +231,4 @@ public abstract class OnActionTouchItemListener<T> implements View.OnTouchListen
             }
         });
     }
-
-    protected abstract void onRemoveItem(T item);
-    protected abstract void onTouchItem(T item);
 }
