@@ -1,4 +1,4 @@
-package com.android.cndd.tripsmanager.Modules;
+package com.android.cndd.tripsmanager.modules;
 
 import com.google.android.gms.maps.model.LatLng;
 

@@ -1,4 +1,4 @@
-package com.android.cndd.tripsmanager.View;
+package com.android.cndd.tripsmanager.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -9,17 +9,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.android.cndd.tripsmanager.Model.ITripViewer;
 import com.android.cndd.tripsmanager.R;
-import com.android.cndd.tripsmanager.ViewHelper.OnFragmentAnimationStartListener;
-import com.android.cndd.tripsmanager.ViewHelper.OnFragmentAnimationEndListener;
+import com.android.cndd.tripsmanager.viewhelper.Editor;
+import com.android.cndd.tripsmanager.viewhelper.OnSlideAnimationStartListener;
+import com.android.cndd.tripsmanager.viewhelper.OnSlideAnimationEndListener;
 
 
 /**
@@ -27,8 +26,8 @@ import com.android.cndd.tripsmanager.ViewHelper.OnFragmentAnimationEndListener;
  */
 
 public class PlansActivity extends AppCompatActivity implements
-        OnFragmentAnimationEndListener,
-        OnFragmentAnimationStartListener,
+        OnSlideAnimationEndListener,
+        OnSlideAnimationStartListener,
         FragmentManager.OnBackStackChangedListener{
 
     private static final String TAG = "PlansActivity";
@@ -42,7 +41,6 @@ public class PlansActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.e(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.plans_activity_layout);
 
@@ -59,10 +57,6 @@ public class PlansActivity extends AppCompatActivity implements
         mPlansListFragment.setClickListener(this);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -79,7 +73,7 @@ public class PlansActivity extends AppCompatActivity implements
             case R.id.edit:
                 Log.d(TAG, "onOptionsItemSelected: edit");
                 Bundle bundle = getIntent().getBundleExtra("plans");
-                bundle.putInt("action",1);
+                bundle.putInt("action", Editor.UPDATE);
                 Intent intent = new Intent(this, TripsCreateActivity.class);
                 intent.putExtra("trip_update", bundle);
                 startActivity(intent);

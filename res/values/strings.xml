@@ -40,7 +40,7 @@
     <string name="note">Note</string>
 
 
-    <string name="title_text">Google Sign-In\nQuickstart</string>
+    <string name="title_text">Trips Manager</string>
     <string name="desc_google_icon">Google Logo</string>
     <string name="signed_out">Signed out</string>
     <string name="sign_out">Sign Out</string>
@@ -49,4 +49,12 @@
     <string name="start">Start</string>
     <string name="exit">Exit</string>
     <string name="details">details</string>
+    <string name="email_address">Email Address</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign In</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="silent">Silent</string>
+    <string name="ringing">Ringing</string>
+    <string name="vibrate">Vibrate</string>
+    <string name="ringer_mode">Ringer Mode</string>
 </resources>

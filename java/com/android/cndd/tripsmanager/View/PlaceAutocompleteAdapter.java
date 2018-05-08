@@ -1,4 +1,4 @@
-package com.android.cndd.tripsmanager.View;
+package com.android.cndd.tripsmanager.view;
 
 import android.content.Context;
 import android.graphics.Typeface;

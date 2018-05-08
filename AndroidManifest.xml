@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.android.cndd.tripsmanager">
 
     <!--
@@ -11,6 +12,9 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-feature android:name="android.hardware.location.gps" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
 
     <application
         android:allowBackup="true"
@@ -20,7 +24,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".View.TripsActivity"
+            android:name=".view.TripsActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,37 +33,48 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".View.TripsCreateActivity"
+        <activity android:name=".view.TripsCreateActivity"
             android:label="@string/add_trip">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".View.TripsActivity"/>
+                android:value=".view.TripsActivity"/>
         </activity>
 
-        <activity android:name=".View.PlansActivity"
-            android:label="@string/plan_name">
+        <activity android:name=".view.PlansActivity"
+            android:label="@string/plan_name"
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".View.TripsActivity"/>
+                android:value=".view.TripsActivity"/>
         </activity>
 
-        <activity android:name=".View.PlanCategoryActivity"
+        <activity android:name=".view.PlanCategoryActivity"
             android:label="@string/plan_category">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".View.PlansActivity"/>
+                android:value=".view.TripsActivity"/>
         </activity>
 
-        <activity android:name=".View.MeetingCreateActivity"
+        <activity android:name=".view.ActivityCreateActivity"
                 android:label="@string/add_meeting">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".View.PlansActivity"/>
+                android:value=".view.TripsActivity"/>
         </activity>
 
-        <activity android:name=".View.NavigatedMapActivity" />
+        <activity android:name=".view.FlightCreateActivity"
+            android:label="@string/add_meeting">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".view.TripsActivity"/>
+        </activity>
 
-        <activity android:name=".View.SignInActivity" />
+        <activity android:name=".view.NavigatedMapActivity" />
+
+        <activity android:name=".view.SignInActivity" />
+        <activity android:name=".view.CarRentalCreateActivity" />
+        <activity android:name=".view.RailCreateActivity" />
+        <activity android:name=".view.RestaurantCreateActivity" />
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -73,6 +88,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <service android:name=".viewhelper.NotificationService" />
     </application>
 
 </manifest>

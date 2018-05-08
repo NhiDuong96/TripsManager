@@ -1,4 +1,4 @@
-package com.android.cndd.tripsmanager.Modules;
+package com.android.cndd.tripsmanager.modules;
 
 /**
  * Created by Mai Thanh Hiep on 4/3/2016.

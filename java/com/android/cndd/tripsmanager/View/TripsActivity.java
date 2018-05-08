@@ -1,4 +1,4 @@
-package com.android.cndd.tripsmanager.View;
+package com.android.cndd.tripsmanager.view;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,21 +6,17 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
-import com.android.cndd.tripsmanager.Model.ITripViewer;
 import com.android.cndd.tripsmanager.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.SignInAccount;
 
 /**
  * Created by Minh Nhi on 3/10/2018.
  */
 
 public class TripsActivity extends AppCompatActivity implements TripsListFragment.OnItemSelectedListener{
-    private static final String TAG = "TripsActivity";
-    public static final String TRIP = "trip";
+
 
     @Override
     protected void onStart() {
@@ -76,7 +72,6 @@ public class TripsActivity extends AppCompatActivity implements TripsListFragmen
 
     @Override
     public void onItemSelectedListener(ITripViewer viewer) {
-        Log.d("A", "onItemSelectedListener: ");
         Intent intent = new Intent(this, PlansActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("trip", viewer);

@@ -1,35 +1,46 @@
-package com.android.cndd.tripsmanager.ViewModel;
+package com.android.cndd.tripsmanager.viewmodel;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.os.AsyncTask;
+import android.arch.lifecycle.ViewModelProviders;
 import android.support.annotation.NonNull;
-import android.util.Log;
+import android.support.v4.app.FragmentActivity;
 
-import com.android.cndd.tripsmanager.EntityDao.DBContext;
-import com.android.cndd.tripsmanager.EntityDao.PlanDao;
-import com.android.cndd.tripsmanager.Model.IPlanViewer;
-import com.android.cndd.tripsmanager.Model.Plan;
+import com.android.cndd.tripsmanager.model.PlanCategory;
+import com.android.cndd.tripsmanager.view.IPlanViewer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * Created by Minh Nhi on 3/4/2018.
  */
 
-public class PlanViewModel extends ViewModel{
-    private static PlanLiveData planLiveData;
-    private DBContext dbContext;
-    private PlanDao planDao;
+public class PlanViewModel extends ViewModel {
     private MutableLiveData<IPlanViewer> selected;
+
+    private PlanLiveData planLiveData;
+
+    private MeetingViewModel meetingViewModel;
+
 
     public PlanViewModel(@NonNull Application application) {
         super(application);
-        dbContext = DBContext.getDBContext(application);
-        planDao = dbContext.planDao();
+    }
+
+    public void initialize(FragmentActivity activity){
+        meetingViewModel = ViewModelProviders.of(activity).get(MeetingViewModel.class);
+        //...
+    }
+
+    public ViewModel getViewModel(IPlanViewer viewer){
+        switch (viewer.getPlanCategoryName()){
+            case Meeting:
+                return meetingViewModel;
+        }
+        return null;
     }
 
     public void select(IPlanViewer viewer){
@@ -38,152 +49,70 @@ public class PlanViewModel extends ViewModel{
         selected = iPlanViewerMutableLiveData;
     }
 
+    public PlanLiveData getPlanLiveData(int trip_id){
+        if(planLiveData == null){
+            planLiveData = new PlanLiveData(trip_id);
+        }
+        return planLiveData;
+    }
+
     public MutableLiveData<IPlanViewer> getSelected(){
         return selected;
     }
 
+    public Object getPlan(IPlanViewer viewer){
+        switch (viewer.getPlanCategoryName()){
+            case Meeting:
+                return meetingViewModel.getMeetingById(viewer.getId());
+
+        }
+        return null;
+    }
+
     @Override
     public void Insert(Object obj) {
-        planDao.insert((Plan)obj);
+        getViewModel((IPlanViewer) obj).Insert(obj);
     }
 
     @Override
     public void Delete(Object obj) {
-        planDao.delete((Plan)obj);
+        getViewModel((IPlanViewer) obj).Delete(obj);
     }
 
     @Override
     public void Update(Object obj) {
-        planDao.update((Plan)obj);
+        getViewModel((IPlanViewer) obj).Update(obj);
     }
 
-    public PlanLiveData initPlanLiveData(int tripId){
-        if(planLiveData == null){
-            planLiveData = new PlanLiveData(dbContext);
-        }
-        planLiveData.loadData(tripId);
-        return planLiveData;
-    }
 
-    public Plan getPlanById(int id){
-        return planDao.getPlanById(id);
-    }
+    public class PlanLiveData extends LiveData<List<IPlanViewer>>{
+        private List<IPlanViewer> plans;
 
-    public Plan getLastItem(){
-        return planDao.getLastItem();
-    }
+        private HashMap<PlanCategory, List<IPlanViewer>> map;
 
-    public Object getObjFromPlan(Plan plan){
-        Object obj = null;
-        switch (plan.getName()){
-            case Meeting:
-                obj = dbContext.meetingDao().getMeeting(plan.getId());
-                break;
-            case Flight:
+        public PlanLiveData(int trip_id){
+            map = new HashMap<>();
+            plans = new ArrayList<>();
 
-                break;
-        }
-        return obj;
-    }
-
-    @Override
-    public UpdateUIListener getUpdateUIListener() {
-        return planLiveData;
-    }
-
-    public class PlanLiveData extends LiveData<List<IPlanViewer>>
-        implements UpdateUIListener {
-        private static final String TAG = "PlanLiveData";
-        private List<IPlanViewer> planViewers = new ArrayList<>();
-        private PlanDao dao;
-        private boolean isReady = false;
-        private int tripId = -1;
-
-        PlanLiveData(DBContext context){
-            dao = context.planDao();
-        }
-
-        @Override
-        protected void onActive() {
-            super.onActive();
-            isReady = true;
-            QueryTransaction.getTransaction().requestForUpdate(this);
-        }
-
-        @Override
-        protected void onInactive() {
-            super.onInactive();
-            isReady = false;
-        }
-
-        @SuppressLint("StaticFieldLeak")
-        public void loadData(int tripId){
-            if(this.tripId == tripId) return;
-            planViewers.clear();
-            new AsyncTask<Void, IPlanViewer, Void>() {
-                @Override
-                protected Void doInBackground(Void... voids) {
-                    for(int plan_id : dao.getAllIds(tripId)){
-                        Plan plan = dao.getPlanById(plan_id);
-                        publishProgress((IPlanViewer) getObjFromPlan(plan));
-                    }
-                    return null;
+            meetingViewModel.getMeetingLiveData(trip_id).observeForever(list -> {
+                if(list == null) return;
+                if(map.containsKey(PlanCategory.Meeting)){
+                    map.remove(PlanCategory.Meeting);
                 }
+                map.put(PlanCategory.Meeting, new ArrayList<>(list));
+                updateUI();
+            });
 
-                @Override
-                protected void onProgressUpdate(IPlanViewer... values) {
-                    super.onProgressUpdate(values);
-                    if(values[0] == null) return;
-                    planViewers.add(values[0]);
-                    setValue(planViewers);
-                }
-            }.execute();
+            //...
         }
 
-        @Override
-        public void onInsert(Query query, QueryArg args) {
-            try {
-                Plan plan = planDao.getLastItem();
-                planViewers.add((IPlanViewer) getObjFromPlan(plan));
+        private void updateUI(){
+            plans.clear();
+            for(List<IPlanViewer> list : map.values()){
+                plans.addAll(list);
             }
-            catch (Exception ex){
-                return;
-            }
-            setValue(planViewers);
+            setValue(plans);
         }
 
-        @Override
-        public void onDelete(Query query, QueryArg queryArgs) {
-            Log.e(TAG, "onDelete: plan");
-            try {
-                planViewers.remove((IPlanViewer) queryArgs.args[0]);
-            }catch (Exception ex){
-                return;
-            }
-            setValue(planViewers);
-        }
-
-        @Override
-        public void onUpdate(Query query, QueryArg queryArgs) {
-            try {
-                for(int i = 0; i < planViewers.size(); i++){
-                    if(planViewers.get(i).getId() == (int)queryArgs.args[0]){
-                        IPlanViewer viewer = (IPlanViewer) query.getObj();
-                        planViewers.set(i, viewer);
-                        selected.setValue(viewer);
-                        break;
-                    }
-                }
-            }catch (Exception ex){
-                Log.e(TAG, "Update: ", ex);
-                return;
-            }
-            setValue(planViewers);
-        }
-
-        @Override
-        public boolean isReadyForUpdate() {
-            return isReady;
-        }
     }
 }

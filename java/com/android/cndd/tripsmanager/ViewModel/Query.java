@@ -1,4 +1,4 @@
-package com.android.cndd.tripsmanager.ViewModel;
+package com.android.cndd.tripsmanager.viewmodel;
 
 
 import android.util.Log;
@@ -11,8 +11,6 @@ public class Query {
     private static final String TAG = "Query";
     protected final ViewModel model;
     protected final Object obj;
-    public boolean allowUpdateUi = true;
-    QueryArg args;
 
     public Query(ViewModel model, Object obj) {
         this.model = model;
@@ -24,35 +22,12 @@ public class Query {
     }
 
     public boolean doOperation(){
-        UpdateUIListener update = model.getUpdateUIListener();
-        if(update != null && update.isReadyForUpdate()) {
-            updateUI(update);
-        }
         return true;
     }
 
     public boolean undoOperation(){
         return true;
     }
-
-    public void updateUI(UpdateUIListener listener){}
-
-    public void allowQueryUpdateUi(boolean update){
-        this.allowUpdateUi = update;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if(model.getUpdateUIListener() == null){
-            return false;
-        }
-        return model.getUpdateUIListener().equals(obj);
-    }
-
-    public void setArguments(Object ... objects){
-        args = new QueryArg(objects);
-    }
-
 
     //Operation
 
@@ -73,11 +48,6 @@ public class Query {
             return super.doOperation();
         }
 
-        @Override
-        public void updateUI(UpdateUIListener listener) {
-            if(allowUpdateUi)
-                listener.onDelete(this, args);
-        }
 
         @Override
         public boolean undoOperation() {
@@ -103,11 +73,6 @@ public class Query {
             return super.doOperation();
         }
 
-        @Override
-        public void updateUI(UpdateUIListener listener) {
-            if(allowUpdateUi)
-                listener.onInsert(this, args);
-        }
 
         @Override
         public boolean undoOperation() {
@@ -131,12 +96,6 @@ public class Query {
                 return false;
             }
             return super.doOperation();
-        }
-
-        @Override
-        public void updateUI(UpdateUIListener listener) {
-            if(allowUpdateUi)
-                listener.onUpdate(this, args);
         }
 
         @Override

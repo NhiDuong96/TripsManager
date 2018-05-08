@@ -1,10 +1,12 @@
-package com.android.cndd.tripsmanager.Model;
+package com.android.cndd.tripsmanager.model;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
+
+import com.android.cndd.tripsmanager.view.ITripViewer;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -14,7 +16,7 @@ import java.util.Date;
  */
 
 @Entity(indices = {@Index(value = {"title"}, unique = true)})
-public class Trip implements ITripViewer{
+public class Trip implements ITripViewer {
     @PrimaryKey(autoGenerate = true)
     private int id;
 
@@ -33,6 +35,8 @@ public class Trip implements ITripViewer{
     private Status status;
 
     private String description;
+
+    private boolean notify;
 
     public Trip(){}
 
@@ -104,7 +108,7 @@ public class Trip implements ITripViewer{
         this.id = id;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(@NonNull String title) {
         this.title = title;
     }
 
@@ -130,5 +134,13 @@ public class Trip implements ITripViewer{
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isNotify() {
+        return notify;
+    }
+
+    public void setNotify(boolean notify) {
+        this.notify = notify;
     }
 }

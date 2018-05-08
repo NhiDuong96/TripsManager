@@ -37,8 +37,39 @@
             android:id="@+id/startdate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/start_date"
+            android:hint="Flight Number"
             android:editable="false" />
     </android.support.design.widget.TextInputLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <android.support.design.widget.TextInputLayout
+            app:hintAnimationEnabled="false"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/seat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="Seat"
+                android:editable="false" />
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            app:hintAnimationEnabled="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/confirmation"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                android:hint="Confirmation"
+                android:editable="false" />
+        </android.support.design.widget.TextInputLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

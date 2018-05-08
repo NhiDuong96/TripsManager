@@ -3,14 +3,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <view
-        class="com.android.cndd.tripsmanager.ViewHelper.BackgroundContainer"
+    <com.android.cndd.tripsmanager.viewhelper.MyRecyclerView
+        android:id="@+id/cardList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/listViewBackground">
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/cardList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </view>
+        android:layout_height="wrap_content"/>
 </LinearLayout>

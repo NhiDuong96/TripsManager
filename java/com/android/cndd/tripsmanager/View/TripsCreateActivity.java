@@ -1,4 +1,4 @@
-package com.android.cndd.tripsmanager.View;
+package com.android.cndd.tripsmanager.view;
 
 import android.app.ProgressDialog;
 import android.arch.lifecycle.ViewModelProviders;
@@ -9,18 +9,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AutoCompleteTextView;
-import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Toast;
 
-import com.android.cndd.tripsmanager.Model.ITripViewer;
-import com.android.cndd.tripsmanager.Model.Trip;
+import com.android.cndd.tripsmanager.model.Trip;
 import com.android.cndd.tripsmanager.R;
-import com.android.cndd.tripsmanager.ViewHelper.PickDate;
-import com.android.cndd.tripsmanager.ViewModel.IQueryViewObserver;
-import com.android.cndd.tripsmanager.ViewModel.Query;
-import com.android.cndd.tripsmanager.ViewModel.QueryFactory;
-import com.android.cndd.tripsmanager.ViewModel.QueryTransaction;
-import com.android.cndd.tripsmanager.ViewModel.TripViewModel;
+import com.android.cndd.tripsmanager.viewhelper.DatePicker;
+import com.android.cndd.tripsmanager.viewhelper.Editor;
+import com.android.cndd.tripsmanager.viewhelper.TimePicker;
+import com.android.cndd.tripsmanager.viewmodel.IProgressQueryObserver;
+import com.android.cndd.tripsmanager.viewmodel.Query;
+import com.android.cndd.tripsmanager.viewmodel.QueryTransaction;
+import com.android.cndd.tripsmanager.viewmodel.TripViewModel;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Places;
 
@@ -40,7 +40,11 @@ public class TripsCreateActivity extends AppCompatActivity {
 
     private AutoCompleteTextView mDestination;
 
-    private EditText mTitle, mDescription, mStartDate, mStartTime, mEndDate, mEndTime;
+    private EditText mTitle, mDescription;
+
+    private TimePicker mStartTime, mEndTime;
+
+    private DatePicker mStartDate, mEndDate;
 
     private Date startDate, endDate;
 
@@ -61,21 +65,22 @@ public class TripsCreateActivity extends AppCompatActivity {
         mTitle = findViewById(R.id.title);
         //trips destination name
         mDestination = findViewById(R.id.destination);
-        //
+
         startDate = new Date();
         endDate = new Date();
         //trips start date
         mStartDate = findViewById(R.id.startdate);
-        PickDate.from(this).setPickDate(mStartDate,startDate);
+        mStartDate.addDate(startDate);
         //trips start time
         mStartTime = findViewById(R.id.starttime);
-        PickDate.from(this).setPickTime(mStartTime,startDate);
-        //trips end date
+        mStartTime.addTime(startDate);
+        //trip end date
         mEndDate = findViewById(R.id.enddate);
-        PickDate.from(this).setPickDate(mEndDate,endDate);
+        mEndDate.addDate(endDate);
         //trips end time
         mEndTime = findViewById(R.id.endtime);
-        PickDate.from(this).setPickTime(mEndTime,endDate);
+        mEndTime.addTime(endDate);
+
         //description
         mDescription = findViewById(R.id.description);
 
@@ -83,17 +88,17 @@ public class TripsCreateActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getBundleExtra("trip_update");
         mAction = bundle.getInt("action");
-        if(mAction == 1){
+        if(mAction == Editor.UPDATE){
             ITripViewer viewer = (ITripViewer) bundle.getSerializable("trip");
             if(viewer != null){
                 mTripId = viewer.getId();
                 Trip trip = tripViewModel.getTripFromId(mTripId);
                 mTitle.setText(trip.getTitle());
                 mDestination.setText(trip.getDestination());
-                mStartDate.setText(PickDate.convertToDate(trip.getStartTime()));
-                mStartTime.setText(PickDate.convertToTime(trip.getStartTime()));
-                mEndDate.setText(PickDate.convertToDate(trip.getEndTime()));
-                mEndTime.setText(PickDate.convertToTime(trip.getEndTime()));
+                mStartDate.setText(DatePicker.convertToDate(trip.getStartTime()));
+                mStartTime.setText(TimePicker.convertToTime(trip.getStartTime()));
+                mEndDate.setText(DatePicker.convertToDate(trip.getEndTime()));
+                mEndTime.setText(TimePicker.convertToTime(trip.getEndTime()));
                 mDescription.setText(trip.getDescription());
             }
         }
@@ -101,7 +106,6 @@ public class TripsCreateActivity extends AppCompatActivity {
         mAdapter = new PlaceAutocompleteAdapter(this ,mGeoDataClient, null, null);
         mDestination.setAdapter(mAdapter);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -114,15 +118,18 @@ public class TripsCreateActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.save:
                 Log.e(TAG, "onOptionsItemSelected: save");
-                Query query;
-                if(mAction == 0){
+                if(mAction == Editor.CREATE){
                     Trip trip = getObj(-1);
-                    query = QueryFactory.initOperation(QueryFactory.INSERT, tripViewModel, trip);
+                    QueryTransaction.getTransaction()
+                            .newOperation(QueryTransaction.INSERT, tripViewModel, trip)
+                            .execute(observer);
+
                 }else{
                     Trip trip = getObj(mTripId);
-                    query = QueryFactory.initOperation(QueryFactory.UPDATE, tripViewModel,trip);
+                    QueryTransaction.getTransaction()
+                            .newOperation(QueryTransaction.UPDATE, tripViewModel,trip)
+                            .execute(observer);
                 }
-                QueryTransaction.getTransaction().execOnBackground(query, observer);
                 break;
             case android.R.id.home:
                 Log.e(TAG, "onOptionsItemSelected: home");
@@ -132,7 +139,7 @@ public class TripsCreateActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private IQueryViewObserver observer = new IQueryViewObserver() {
+    private IProgressQueryObserver observer = new IProgressQueryObserver() {
 
         @Override
         public void onStartQuery() {
@@ -154,17 +161,18 @@ public class TripsCreateActivity extends AppCompatActivity {
 
         @Override
         public void onFailQuery(Query query) {
-
+            Toast.makeText(TripsCreateActivity.this, "Can not save change!", Toast.LENGTH_SHORT).show();
         }
     };
 
     public Trip getObj(int trip_id){
         Trip trip = new Trip();
-        if(mAction == 1) trip.setId(trip_id);
+        if(mAction == Editor.UPDATE) trip.setId(trip_id);
         trip.setTitle(mTitle.getText().toString());
         trip.setDestination(mDestination.getText().toString());
         trip.setStartTime(startDate);
         trip.setEndTime(endDate);
+        trip.setNotify(false);
         trip.setDescription(mDescription.getText().toString());
         return trip;
     }

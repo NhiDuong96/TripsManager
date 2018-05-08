@@ -1,6 +1,5 @@
-package com.android.cndd.tripsmanager.View;
+package com.android.cndd.tripsmanager.view;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,19 +10,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.cndd.tripsmanager.Modules.JsonUrlLoader;
+import com.android.cndd.tripsmanager.modules.JsonUrlLoader;
 import com.android.cndd.tripsmanager.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,7 +30,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
@@ -45,14 +41,29 @@ public class ProfileFragment extends Fragment {
     private static final String TAG = "ProfileFragment";
     private static final String URL = "https://www.googleapis.com/plus/v1/people/";
     private static final String API_KEY = "AIzaSyBehRrJCJXU07UgGl_kxvdi63xmK9kaWxU";
-
+    private View view;
+    private boolean isUpdate = false;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.main_profile_fragment, container, false);
+        view = inflater.inflate(R.layout.main_profile_fragment, container, false);
+        loadUser();
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(isUpdate) {
+            loadUser();
+            isUpdate = false;
+        }
+    }
+
+    public void loadUser(){
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
-        if(account == null) return view;
+        if(account == null) return;
 
         TextView name, email;
         name = view.findViewById(R.id.name);
@@ -68,25 +79,14 @@ public class ProfileFragment extends Fragment {
         }
         icon.setImageBitmap(bitmap);
 
-        Button button = view.findViewById(R.id.logout);
-        button.setOnClickListener((v) ->{
+        ImageButton sign_out = view.findViewById(R.id.logout);
+        sign_out.setOnClickListener((v) ->{
             //logout
+            isUpdate = true;
             deleteBitmapFromInternalStorage();
             Intent intent = new Intent(getActivity(),SignInActivity.class);
-            startActivityForResult(intent, 1000);
+            startActivity(intent);
         });
-        return view;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 1000){
-            getFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.frame_layout,new ProfileFragment())
-                    .commit();
-        }
     }
 
     private Bitmap loadBitmapFromUrl(String url){
@@ -97,9 +97,11 @@ public class ProfileFragment extends Fragment {
             JSONObject image = jsonObject.getJSONObject("image");
             bitmap = new LoadProfileImage().execute(image.getString("url")).get();
         } catch (InterruptedException | ExecutionException | JSONException e) {
-            e.printStackTrace();
             Log.e(TAG, "loadBitmapFromUrl: ", e);
-            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_background);
+        }
+        if(bitmap == null){
+            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icons8_user);
+            Log.e(TAG, "loadBitmapFromUrl: " + bitmap.toString());
         }
         return bitmap;
     }

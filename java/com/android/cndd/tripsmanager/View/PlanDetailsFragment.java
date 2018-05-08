@@ -1,4 +1,4 @@
-package com.android.cndd.tripsmanager.View;
+package com.android.cndd.tripsmanager.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
@@ -17,25 +17,20 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ImageButton;
 
-import com.android.cndd.tripsmanager.Model.ITripViewer;
-import com.android.cndd.tripsmanager.Model.PlanCategories;
-import com.android.cndd.tripsmanager.Model.IPlanViewer;
-import com.android.cndd.tripsmanager.Model.Plan;
 import com.android.cndd.tripsmanager.R;
-import com.android.cndd.tripsmanager.ViewHelper.OnFragmentAnimationEndListener;
-import com.android.cndd.tripsmanager.ViewModel.PlanViewModel;
-import com.android.cndd.tripsmanager.ViewModel.Query;
-import com.android.cndd.tripsmanager.ViewModel.QueryFactory;
-import com.android.cndd.tripsmanager.ViewModel.QueryTransaction;
+import com.android.cndd.tripsmanager.viewhelper.Editor;
+import com.android.cndd.tripsmanager.viewhelper.OnSlideAnimationEndListener;
+import com.android.cndd.tripsmanager.viewmodel.PlanViewModel;
+import com.android.cndd.tripsmanager.viewmodel.QueryTransaction;
 
 /**
  * Created by Minh Nhi on 3/14/2018.
  */
 
 public class PlanDetailsFragment extends Fragment implements View.OnClickListener {
-
+    private static final String TAG = "PlanDetailsFragment";
     private View.OnClickListener clickListener;
-    private OnFragmentAnimationEndListener mListener;
+    private OnSlideAnimationEndListener mListener;
     private WebView webView;
     private IPlanViewer object;
     private PlanViewModel planViewModel;
@@ -52,6 +47,7 @@ public class PlanDetailsFragment extends Fragment implements View.OnClickListene
                 webView.loadData(iPlanViewer.toHtmlLayout(),"text/html", "utf-8");
             });
     }
+
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -71,15 +67,15 @@ public class PlanDetailsFragment extends Fragment implements View.OnClickListene
         edit.setOnClickListener(v->{
             if(object == null ||  mTripViewer == null) return;
             Intent intent = null;
-            switch (PlanCategories.valueOf(object.getCategoryName())){
+            switch (object.getPlanCategoryName()){
                 case Meeting:
-                    intent = new Intent(getContext(),MeetingCreateActivity.class);
+                    intent = new Intent(getContext(),ActivityCreateActivity.class);
                     break;
                 case Restaurant:
                     break;
             }
             Bundle b = new Bundle();
-            b.putInt("action", 1);
+            b.putInt("action", Editor.UPDATE);
             b.putInt("tripId", mTripViewer.getId());
             b.putInt("planId", object.getId());
             intent.putExtra("plan", b);
@@ -88,10 +84,9 @@ public class PlanDetailsFragment extends Fragment implements View.OnClickListene
 
         FloatingActionButton del = view.findViewById(R.id.delete);
         del.setOnClickListener(v ->{
-            Plan plan = planViewModel.getPlanById(object.getId());
-            Query query = QueryFactory.initOperation(QueryFactory.DELETE, planViewModel, plan);
-            query.setArguments(object);
-            QueryTransaction.getTransaction().execOnMainThread(query);
+            QueryTransaction.getTransaction()
+                    .newOperation(QueryTransaction.DELETE, planViewModel, planViewModel.getPlan(object))
+                    .execute();
         });
         del.setOnClickListener(clickListener);
         return view;
@@ -118,7 +113,7 @@ public class PlanDetailsFragment extends Fragment implements View.OnClickListene
         return anim;
     }
 
-    public void setOnTextFragmentAnimationEnd(OnFragmentAnimationEndListener listener)
+    public void setOnTextFragmentAnimationEnd(OnSlideAnimationEndListener listener)
     {
         mListener = listener;
     }

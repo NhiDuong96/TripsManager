@@ -1,30 +1,24 @@
-package com.android.cndd.tripsmanager.View;
+package com.android.cndd.tripsmanager.view;
 
 import android.Manifest;
 import android.app.ProgressDialog;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
-import com.android.cndd.tripsmanager.Model.IPlanViewer;
-import com.android.cndd.tripsmanager.Modules.DirectionFinder;
-import com.android.cndd.tripsmanager.Modules.DirectionFinderListener;
-import com.android.cndd.tripsmanager.Modules.Route;
-import com.android.cndd.tripsmanager.View.PlaceAutocompleteAdapter;
+import com.android.cndd.tripsmanager.modules.DirectionFinder;
+import com.android.cndd.tripsmanager.modules.DirectionFinderListener;
+import com.android.cndd.tripsmanager.modules.Route;
 import com.android.cndd.tripsmanager.R;
-import com.android.cndd.tripsmanager.ViewModel.PlanViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.AutocompletePrediction;

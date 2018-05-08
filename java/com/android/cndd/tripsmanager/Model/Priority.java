@@ -1,4 +1,4 @@
-package com.android.cndd.tripsmanager.Model;
+package com.android.cndd.tripsmanager.model;
 
 /**
  * Created by Minh Nhi on 1/28/2018.

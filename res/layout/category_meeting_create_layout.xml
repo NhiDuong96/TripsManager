@@ -5,17 +5,15 @@
     android:scrollbars="vertical"
     android:padding="16dp">
     <TextView
+        android:id="@+id/type"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="12sp"
+        android:textSize="17sp"
         android:paddingStart="5dp"
+        android:layout_marginBottom="20dp"
+        android:textStyle="bold"
         android:text="@string/activity_type"
         />
-    <Spinner
-        android:id="@+id/spinner"
-        android:layout_marginTop="5dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -25,7 +23,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"
-            android:imeOptions="actionDone"
             android:hint="@string/description" />
     </android.support.design.widget.TextInputLayout>
     <android.support.design.widget.TextInputLayout
@@ -35,7 +32,6 @@
             android:id="@+id/location_name"
             android:hint="@string/location_name"
             android:inputType="text"
-            android:imeOptions="actionDone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </android.support.design.widget.TextInputLayout>
@@ -47,7 +43,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"
-            android:imeOptions="actionDone"
             android:hint="@string/address" />
     </android.support.design.widget.TextInputLayout>
     <include

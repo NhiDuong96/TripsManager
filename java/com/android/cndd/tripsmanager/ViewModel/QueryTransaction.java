@@ -1,10 +1,11 @@
-package com.android.cndd.tripsmanager.ViewModel;
+package com.android.cndd.tripsmanager.viewmodel;
 
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.SystemClock;
-import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -13,12 +14,18 @@ import java.util.Stack;
 
 public class QueryTransaction {
     private static final String TAG = "QueryTransaction";
+    public static final int INSERT = 1;
+    public static final int DELETE = 2;
+    public static final int UPDATE = 3;
 
-    private Stack<Query> queryStack;
+    private final Stack<Query> queryStack;
+    private final List<Query> queryList;
+
     private static QueryTransaction transaction;
 
     private QueryTransaction() {
         queryStack = new Stack<>();
+        queryList = new ArrayList<>();
     }
 
     public static QueryTransaction getTransaction(){
@@ -27,21 +34,46 @@ public class QueryTransaction {
         }
         return transaction;
     }
+
+
+    public QueryTransaction newOperation(int operator, ViewModel model, Object obj){
+        Query query;
+        switch (operator){
+            case INSERT:
+
+                query = new Query.InsertOperation(model,obj);
+                break;
+            case DELETE:
+                query = new Query.DeleteOperation(model,obj);
+                break;
+            case UPDATE:
+                query = new Query.UpdateOperation(model, obj);
+                break;
+            default:
+                query = new Query(model, obj);
+                break;
+        }
+        queryList.add(query);
+        return this;
+    }
+
     public void undo(){
         Query query = queryStack.pop();
         query.undoOperation();
     }
 
-    public void execOnMainThread(Query query){
-        if(query.doOperation()){
-            queryStack.push(query);
+    public void execute(){
+        for(Query query: queryList) {
+            if (query.doOperation()) {
+                queryStack.push(query);
+            }
         }
+        queryList.clear();
     }
 
     @SuppressLint("StaticFieldLeak")
-    public void execOnBackground(Query query, IQueryViewObserver observer){
-        if (observer == null) return;
-          new AsyncTask<Query, Void, Void>() {
+    public void execute(IProgressQueryObserver observer){
+          new AsyncTask<Void, Void, Void>() {
               @Override
               protected void onPreExecute() {
                   super.onPreExecute();
@@ -49,13 +81,15 @@ public class QueryTransaction {
               }
 
               @Override
-            protected Void doInBackground(Query... queries) {
+            protected Void doInBackground(Void... voids) {
                   SystemClock.sleep(500);
-                  if(queries[0].doOperation()){
-                      observer.onSuccessQuery(queries[0]);
-                      queryStack.push(queries[0]);
-                  }else{
-                      observer.onFailQuery(queries[0]);
+                  for(Query query: queryList) {
+                      if (query.doOperation()) {
+                          observer.onSuccessQuery(query);
+                          queryStack.push(query);
+                      } else {
+                          observer.onFailQuery(query);
+                      }
                   }
                 return null;
             }
@@ -64,16 +98,9 @@ public class QueryTransaction {
               protected void onPostExecute(Void aVoid) {
                   super.onPostExecute(aVoid);
                   observer.onEndQuery();
+                  queryList.clear();
               }
-          }.execute(query);
+          }.execute();
     }
 
-    public void requestForUpdate(UpdateUIListener observer){
-        for(Query query : queryStack){
-            if(query.equals(observer)){
-                query.updateUI(observer);
-                query.allowQueryUpdateUi(false);
-            }
-        }
-    }
 }
